@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Data
 @AllArgsConstructor
@@ -16,6 +16,6 @@ public class OrderDTO {
     private Integer lineUserId;
     private Integer orderStatus;
     private Integer total;
-    private LocalDateTime createAt;
-    private LocalDateTime lastModifiedAt;
+    private ZonedDateTime createAt;
+    private ZonedDateTime lastModifiedAt;
 }

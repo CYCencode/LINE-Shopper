@@ -7,4 +7,5 @@ public interface OrderDao {
     Integer findCartByUserId(String lineUserId);
     Integer updateOrderTotal(Integer cartId);
     Integer updateOrderStatus(Integer cartId,Integer orderStatus);
+    String getTodaySerialNumber();
 }
