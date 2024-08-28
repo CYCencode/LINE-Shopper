@@ -7,9 +7,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class OrderDetailImpl implements OrderDetail {
+public class OrderDetailDaoImpl implements OrderDetailDao {
     private final NamedParameterJdbcTemplate template;
-    public OrderDetailImpl(NamedParameterJdbcTemplate template) {
+    public OrderDetailDaoImpl(NamedParameterJdbcTemplate template) {
         this.template = template;
     }
     @Override
