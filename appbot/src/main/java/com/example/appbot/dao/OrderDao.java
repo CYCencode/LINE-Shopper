@@ -6,4 +6,5 @@ public interface OrderDao {
     Integer createOrder(String lineUserId, Integer orderStatus, Integer productId);
     Integer findCartByUserId(String lineUserId);
     Integer updateOrderTotal(Integer cartId);
+    Integer updateOrderStatus(Integer cartId,Integer orderStatus);
 }

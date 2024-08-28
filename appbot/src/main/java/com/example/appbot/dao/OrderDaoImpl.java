@@ -56,6 +56,15 @@ public class OrderDaoImpl implements OrderDao{
         return template.update(sql, params);
     }
 
+    @Override
+    public Integer updateOrderStatus(Integer cartId, Integer orderStatus){
+        String sql = "UPDATE orders SET order_status = :status WHERE id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("status", orderStatus);
+        params.addValue("id", cartId);
+        return template.update(sql, params);
+    }
+
 }
 
 
