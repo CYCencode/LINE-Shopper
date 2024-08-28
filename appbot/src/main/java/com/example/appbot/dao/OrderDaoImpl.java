@@ -1,5 +1,6 @@
 package com.example.appbot.dao;
 
+import com.example.appbot.enums.StatusCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,6 +25,9 @@ public class OrderDaoImpl implements OrderDao{
         this.productDao = productDao;
         this.orderDetailDao = orderDetailDao;
     }
+    private ZoneId getTimeZone() {
+        return ZoneId.of("Asia/Taipei");
+    }
     @Override
     public Integer findCartByUserId(String lineUserId){
         String sql ="SELECT id FROM orders WHERE line_user_id = :user_id";
@@ -41,12 +45,10 @@ public class OrderDaoImpl implements OrderDao{
            future need to init total as 0, calculate total & update total
          */
         Integer price = productDao.findProductPrice(productId);
-        ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.systemDefault());
-        String order_no = getTodaySerialNumber();
-        String sql = "INSERT INTO orders (order_no, line_user_id, order_status, total, create_at, last_modify_at) " +
-                "VALUES (:order_no, :line_user_id, :order_status, :total, :currentTime, :currentTime)";
+        ZonedDateTime currentTime = ZonedDateTime.now(getTimeZone());
+        String sql = "INSERT INTO orders (line_user_id, order_status, total, create_at, last_modify_at) " +
+                "VALUES (:line_user_id, :order_status, :total, :currentTime, :currentTime)";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("order_no", order_no);
         params.addValue("line_user_id", lineUserId);
         params.addValue("order_status", orderStatus);
         params.addValue("total", price);
@@ -68,19 +70,30 @@ public class OrderDaoImpl implements OrderDao{
     }
 
     @Override
-    public Integer updateOrderStatus(Integer cartId, Integer orderStatus){
-        ZonedDateTime currentTime = ZonedDateTime.now(ZoneId.systemDefault());
-        String sql = "UPDATE orders SET order_status = :status, last_modify_at = :lastModifyAt WHERE id = :id";
+    public Integer updateOrderStatus(Integer cartId, Integer orderStatus) {
+        ZonedDateTime currentTime = ZonedDateTime.now(getTimeZone());
         MapSqlParameterSource params = new MapSqlParameterSource();
+        StringBuilder sql = new StringBuilder("UPDATE orders SET order_status = :status, last_modify_at = :lastModifyAt");
         params.addValue("status", orderStatus);
         params.addValue("id", cartId);
         params.addValue("lastModifyAt", currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        return template.update(sql, params);
+
+        if (orderStatus == StatusCode.ORDER_STATUS_PAID.ordinal()) {
+            String order_no = getTodaySerialNumber();
+            params.addValue("order_no", order_no);
+            sql.append(", order_no = :order_no");
+        }
+
+        sql.append(" WHERE id = :id");
+        return template.update(sql.toString(), params);
     }
+    /*
+    TODO: consider database timezone vs. ZonedDateTime
+     */
 
     @Override
     public String getTodaySerialNumber(){
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+        ZonedDateTime now = ZonedDateTime.now(getTimeZone());
         String date = now.format(DateTimeFormatter.ofPattern("yyMMdd"));
         char hour = (char)('A'+now.getHour());
         String sql ="SELECT COUNT(*) FROM orders WHERE DATE(create_at) = :today AND HOUR(create_at) = :hour";
