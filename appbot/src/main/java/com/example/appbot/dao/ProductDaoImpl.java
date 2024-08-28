@@ -34,4 +34,12 @@ public class ProductDaoImpl implements ProductDao{
 
         return template.query(sql, params, new ProductDTORowMapper());
     }
+
+    @Override
+    public Integer findProductPrice(Integer productId){
+        String sql = "SELECT price FROM products WHERE id=:productId";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("productId", productId);
+        return template.queryForObject(sql, params, Integer.class);
+    };
 }
