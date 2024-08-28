@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Repository
-public class ProductDaoImpl implements ProdcutDao{
+public class ProductDaoImpl implements ProductDao{
 
     @Autowired
     private NamedParameterJdbcTemplate template;
