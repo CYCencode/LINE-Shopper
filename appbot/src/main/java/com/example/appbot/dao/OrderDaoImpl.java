@@ -47,7 +47,11 @@ public class OrderDaoImpl implements OrderDao{
         Integer price = productDao.findProductPrice(productId);
         ZonedDateTime currentTime = ZonedDateTime.now(getTimeZone());
         String sql = "INSERT INTO orders (line_user_id, order_status, total, create_at, last_modify_at) " +
+<<<<<<< HEAD
                 "VALUES (:line_user_id, :order_status, :total, :currentTime, :currentTime)";
+=======
+                "VALUES (:line_user_id, :order_status, :total, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+>>>>>>> feat-checkoutService
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("line_user_id", lineUserId);
         params.addValue("order_status", orderStatus);
