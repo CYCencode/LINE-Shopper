@@ -5,11 +5,10 @@ import com.example.appbot.service.CheckoutService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller("/api/v1")
+@Controller
+@RequestMapping("/api/v1")
 public class CheckoutController {
 
     private final CheckoutService checkoutService;

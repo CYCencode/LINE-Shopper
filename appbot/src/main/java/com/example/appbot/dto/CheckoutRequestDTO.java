@@ -25,8 +25,8 @@ public class CheckoutRequestDTO {
     private String lineUserId;
 
     @NotNull
-    @JsonProperty("product_id")
-    private Integer productId;
+    @JsonProperty("cart_id")
+    private Integer cartId;
 
     @NotNull
     @JsonProperty("receiver_name")

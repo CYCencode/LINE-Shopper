@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 public class OrderDaoImpl implements OrderDao{
     private final NamedParameterJdbcTemplate template;
     private final ProductDao productDao;
-    private final OrderDetail orderDetail;
-    public OrderDaoImpl(NamedParameterJdbcTemplate template, ProductDao productDao, OrderDetail orderDetail) {
+    private final OrderDetailDao orderDetailDao;
+    public OrderDaoImpl(NamedParameterJdbcTemplate template, ProductDao productDao, OrderDetailDao orderDetailDao) {
         this.template = template;
         this.productDao = productDao;
-        this.orderDetail = orderDetail;
+        this.orderDetailDao = orderDetailDao;
     }
     @Override
     public Integer findCartByUserId(String lineUserId){
@@ -35,7 +35,7 @@ public class OrderDaoImpl implements OrderDao{
          */
         Integer price = productDao.findProductPrice(productId);
         String sql = "INSERT INTO orders (line_user_id, order_status, total, create_at, last_modify_at) " +
-                "VALUES (:line_user_id, :orderStatus, :total, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+                "VALUES (:line_user_id, :order_status, :total, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("line_user_id", lineUserId);
         params.addValue("order_status", orderStatus);
@@ -48,7 +48,7 @@ public class OrderDaoImpl implements OrderDao{
 
     @Override
     public Integer updateOrderTotal(Integer cartId){
-        Integer total = orderDetail.calcCartTotal(cartId);
+        Integer total = orderDetailDao.calcCartTotal(cartId);
         String sql = "UPDATE orders SET total = :total WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", cartId);

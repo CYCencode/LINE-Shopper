@@ -5,7 +5,7 @@ import com.example.appbot.dto.CheckoutRequestDTO;
 public interface CheckoutService {
     void handleCheckout(CheckoutRequestDTO dto);
 
-    Boolean verifyPayment(CheckoutRequestDTO dto);
+    Boolean verifyPayment(CheckoutRequestDTO dto, Integer orderId, Integer totalPrice);
 
-    Boolean verifyLogistic(CheckoutRequestDTO dto);
+    Boolean verifyLogistic(CheckoutRequestDTO dto, Integer orderId, Integer totalPrice);
 }
