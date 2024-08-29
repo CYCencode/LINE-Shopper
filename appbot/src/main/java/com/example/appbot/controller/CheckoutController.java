@@ -7,6 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
 @RequestMapping("/api/v1")
 public class CheckoutController {
@@ -19,7 +22,13 @@ public class CheckoutController {
 
     @PostMapping("/order/checkout")
     public ResponseEntity<?> checkout(@RequestBody @Validated CheckoutRequestDTO dto) {
-        checkoutService.handleCheckout(dto);
-        return ResponseEntity.ok(dto);
+        Map<String, Object> map = new HashMap<>();
+        try {
+            checkoutService.handleCheckout(dto);
+            map.put("success", true);
+        } catch (Exception e) {
+            map.put("success", false);
+        }
+        return ResponseEntity.ok(map);
     }
 }

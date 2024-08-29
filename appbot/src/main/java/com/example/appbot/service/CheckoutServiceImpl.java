@@ -79,17 +79,17 @@ public class CheckoutServiceImpl implements CheckoutService{
             OrderDTO orderDTO = orderDao.findOrderById(orderId);
             log.info(orderDTO);
             if(orderDTO.getOrderNo() == null) {
-                long timestamp = System.currentTimeMillis() % 1000000;
+                long timestamp = System.currentTimeMillis() % 10000;
                 orderNo = orderDao.getTodaySerialNumber() + timestamp;
                 orderDTO.setOrderNo(orderNo);
-//                orderDao.updateOrderNoById(orderId, orderNo);
+                orderDao.updateOrderNoById(orderId, orderNo);
             } else {
                 orderNo = orderDTO.getOrderNo();
             }
 
             verifyLogistic(crDTO, orderDTO);
             verifyPayment(crDTO, orderDTO);
-//            orderDao.updateOrderStatus(orderId, StatusCode.ORDER_STATUS_PAID.ordinal());
+            orderDao.updateOrderStatus(orderId, StatusCode.ORDER_STATUS_PAID.ordinal());
             msg = String.format("訂單 %s 已成立", orderNo);
         } catch (CheckoutException e) {
             msg = String.format("訂單 %s %s", orderNo, e.getMessage());

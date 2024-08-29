@@ -2,6 +2,7 @@ package com.example.appbot.dao;
 
 import com.example.appbot.dto.OrderDTO;
 import com.example.appbot.enums.StatusCode;
+import com.example.appbot.exception.CheckoutException;
 import com.example.appbot.rowmapper.OrderDTORowMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -40,7 +41,7 @@ public class OrderDaoImpl implements OrderDao{
         try {
             return template.queryForObject(sql, params, Integer.class);
         } catch (EmptyResultDataAccessException e) {
-            return null;
+            throw new CheckoutException("帳號錯誤");
         }
     }
     @Override
@@ -117,7 +118,11 @@ public class OrderDaoImpl implements OrderDao{
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 
-        return template.queryForObject(sql, params, new OrderDTORowMapper());
+        try {
+            return template.queryForObject(sql, params, new OrderDTORowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            throw new CheckoutException("訂單錯誤");
+        }
     }
 
     @Override
