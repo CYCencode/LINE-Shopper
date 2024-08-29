@@ -50,6 +50,10 @@
             });
         });
         function onSubmit(){
+            // check if from is valid
+            if(!validateForm()){
+                return; //stop submit
+            }
             // get params from URL
             const url_params = new URLSearchParams(window.location.search);
             const line_user_id = url_params.get('line_user_id');
@@ -97,8 +101,69 @@
                         console.error("Error: ", error);
                         alert("提交訂單時發生錯誤！請稍後再試");
                     });
-                });
+            });
+        }
+        function validateField(field, pattern, errorMessage) {
+            const value = field.value;
+            const isValid = pattern.test(value);
+            const errorElement = document.getElementById(field.id + '-error');
+
+            if (!isValid) {
+                field.classList.add('error');
+                errorElement.textContent = errorMessage;
+                field.setAttribute('data-valid', 'false');
+            } else {
+                field.classList.remove('error');
+                errorElement.textContent = '';
+                field.setAttribute('data-valid', 'true');
             }
+        }
+
+        function validateForm() {
+            const fields = [
+                {
+                    id: 'recipient-name',
+                    pattern: /^[\u4e00-\u9fa5]{2,5}$/,
+                    errorMessage: "收件人姓名必須是2-5個中文字，不可以帶數字與特殊符號"
+                },
+                {
+                    id: 'recipient-phone',
+                    pattern: /^09\d{8}$/,
+                    errorMessage: "收件人電話必須是09開頭的10位數字"
+                },
+                {
+                    id: 'recipient-address',
+                    pattern: /^[\u4e00-\u9fa5]{6,60}$/,
+                    errorMessage: "收件人地址必須是6-60個中文字"
+                },
+                {
+                    id: 'recipient-zipcode',
+                    pattern: /^\d{1,6}$/,
+                    errorMessage: "收件人郵遞區號必須是6位內的數字"
+                },
+                {
+                    id: 'recipient-email',
+                    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    errorMessage: "請輸入有效的電子郵件地址"
+                }
+            ];
+
+            fields.forEach(field => {
+                const element = document.getElementById(field.id);
+                validateField(element, field.pattern, field.errorMessage);
+            });
+
+            return document.querySelectorAll('[data-valid="false"]').length === 0;
+        }
+        // add in-time validation for each input
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    validateForm();
+                });
+            });
+        });
     </script>
     <style>
         .tpfield {
@@ -108,49 +173,62 @@
             margin: 5px 0;
             padding: 5px;
         }
+        .error-message {
+            color: red;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        input.error {
+            border: 1px solid red;
+        }
     </style>
 </head>
 <body>
+<div>
+    <h3>付款資訊</h3>
     <div>
-        <h3>付款資訊</h3>
-        <div>
-            <input type="radio" id="payment_method" name="payment_method" value="TapPay">
-            <label for="payment_method">信用卡付款</label>
-        </div>
-        <div>
-            <label for="card-number">Credit Card Number</label>
-            <div class="tpfield" id="card-number"></div>
-        </div>
-        <div>
-            <label for="card-expiration-date">Valid Thru</label>
-            <div class="tpfield" id="card-expiration-date"></div>
-        </div>
-        <div>
-            <label for="card-ccv">CCV</label>
-            <div class="tpfield" id="card-ccv"></div>
-        </div>
+        <input type="radio" id="payment_method" name="payment_method" value="TapPay">
+        <label for="payment_method">信用卡付款</label>
     </div>
+    <div>
+        <label for="card-number">Credit Card Number</label>
+        <div class="tpfield" id="card-number"></div>
+    </div>
+    <div>
+        <label for="card-expiration-date">Valid Thru</label>
+        <div class="tpfield" id="card-expiration-date"></div>
+    </div>
+    <div>
+        <label for="card-ccv">CCV</label>
+        <div class="tpfield" id="card-ccv"></div>
+    </div>
+</div>
 <div>
     <h3>黑貓宅配資訊</h3>
     <div>
         <label for="recipient-name">收件人姓名</label>
         <input type="text" id="recipient-name" placeholder="請輸入收件人姓名" required />
+        <div id="recipient-name-error" class="error-message"></div>
     </div>
     <div>
         <label for="recipient-phone">收件人電話</label>
         <input type="text" id="recipient-phone" placeholder="請輸入收件人電話" required />
+        <div id="recipient-phone-error" class="error-message"></div>
     </div>
     <div>
         <label for="recipient-address">收件人地址</label>
         <input type="text" id="recipient-address" placeholder="請輸入收件人地址" required />
+        <div id="recipient-address-error" class="error-message"></div>
     </div>
     <div>
         <label for="recipient-zipcode">收件人郵遞區號</label>
         <input type="text" id="recipient-zipcode" placeholder="請輸入郵遞區號" required />
+        <div id="recipient-zipcode-error" class="error-message"></div>
     </div>
     <div>
         <label for="recipient-email">收件人電子郵件</label>
         <input type="email" id="recipient-email" placeholder="請輸入電子郵件" required />
+        <div id="recipient-email-error" class="error-message"></div>
     </div>
 </div>
 <button onclick="onSubmit()">結帳</button>
