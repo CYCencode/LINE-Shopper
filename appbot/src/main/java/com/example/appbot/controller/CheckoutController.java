@@ -1,5 +1,6 @@
 package com.example.appbot.controller;
 
+import com.example.appbot.dao.OrderDao;
 import com.example.appbot.dto.CheckoutRequestDTO;
 import com.example.appbot.service.CheckoutService;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,11 @@ import java.util.Map;
 @RequestMapping("/api/v1")
 public class CheckoutController {
 
+    private final OrderDao orderDao;
     private final CheckoutService checkoutService;
 
-    public CheckoutController(CheckoutService checkoutService) {
+    public CheckoutController(OrderDao orderDao, CheckoutService checkoutService) {
+        this.orderDao = orderDao;
         this.checkoutService = checkoutService;
     }
 
@@ -24,8 +27,13 @@ public class CheckoutController {
     public ResponseEntity<?> checkout(@RequestBody @Validated CheckoutRequestDTO dto) {
         Map<String, Object> map = new HashMap<>();
         try {
-            checkoutService.handleCheckout(dto);
-            map.put("success", true);
+            Integer orderId = orderDao.findCartByUserId(dto.getLineUserId());
+            if (orderId != null) {
+                checkoutService.handleCheckout(dto);
+                map.put("success", true);
+            } else {
+                map.put("success", false);
+            }
         } catch (Exception e) {
             map.put("success", false);
         }
