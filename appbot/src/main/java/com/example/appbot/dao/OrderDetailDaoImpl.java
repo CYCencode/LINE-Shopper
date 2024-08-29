@@ -12,6 +12,27 @@ public class OrderDetailDaoImpl implements OrderDetailDao {
     public OrderDetailDaoImpl(NamedParameterJdbcTemplate template) {
         this.template = template;
     }
+
+    @Override
+    public Integer findCountOrderDetailByOrderId(Integer cartId, Integer productId) {
+        String sql = "SELECT count(*) num FROM order_details WHERE order_id = :order_id AND product_id = :product_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("order_id", cartId)
+            .addValue("product_id", productId);
+
+        return template.queryForObject(sql, params, Integer.class);
+    }
+
+    @Override
+    public Integer incQtyOrderDetailByOrderId(Integer cartId, Integer productId) {
+        String sql = "UPDATE order_details SET quantity = quantity + 1 WHERE order_id = :order_id and product_id = :product_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("product_id", productId)
+            .addValue("order_id", cartId);
+
+        return template.update(sql, params);
+    }
+
     @Override
     public Integer addOrderDetail(Integer cartId, Integer productId, Integer quantity){
         String sql = "INSERT INTO order_details (quantity, order_id, product_id) " +

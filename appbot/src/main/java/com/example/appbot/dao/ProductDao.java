@@ -7,5 +7,6 @@ import java.util.List;
 public interface ProductDao {
     List<ProductDTO> findProduct(Integer limit);
     List<ProductDTO> findProductByCategory(Integer limit, String category);
+    List<ProductDTO> findProductByKeyword(String keyword);
     Integer findProductPrice(Integer productId);
 }

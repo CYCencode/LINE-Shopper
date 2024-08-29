@@ -18,7 +18,7 @@ public class ProductDaoImpl implements ProductDao{
 
     @Override
     public List<ProductDTO> findProduct(Integer limit) {
-        String sql = "select * from products limit :limit";
+        String sql = "SELECT * FROM products LIMIT :limit";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("limit", limit);
 
@@ -27,10 +27,19 @@ public class ProductDaoImpl implements ProductDao{
 
     @Override
     public List<ProductDTO> findProductByCategory(Integer limit, String category) {
-        String sql = "select * from products where category=:category limit :limit";
+        String sql = "SELECT * FROM products WHERE category=:category LIMIT :limit";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("limit", limit);
         params.addValue("category", category);
+
+        return template.query(sql, params, new ProductDTORowMapper());
+    }
+
+    @Override
+    public List<ProductDTO> findProductByKeyword(String keyword) {
+        String sql = "SELECT * FROM products WHERE name LIKE :keyword LIMIT 3";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("keyword", "%" + keyword + "%");
 
         return template.query(sql, params, new ProductDTORowMapper());
     }

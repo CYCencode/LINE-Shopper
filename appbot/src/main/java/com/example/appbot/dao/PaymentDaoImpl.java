@@ -18,7 +18,7 @@ public class PaymentDaoImpl implements PaymentDao{
 
     @Override
     public Integer createPayment(Integer orderId, String method) {
-        String sql = "insert into payments (id, order_id, method) values (default, :order_id, :method)";
+        String sql = "INSERT INTO payments (id, order_id, method) VALUES (default, :order_id, :method)";
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("order_id", orderId)
             .addValue("method", method);

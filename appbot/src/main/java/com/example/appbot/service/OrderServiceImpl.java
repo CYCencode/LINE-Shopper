@@ -19,11 +19,14 @@ public class OrderServiceImpl implements OrderService {
     public void addToCart(String userId, String productId) {
         Integer cartId = orderDao.findCartByUserId(userId);
         if (cartId == null) {
-            Integer orderId = orderDao.createOrder(userId, StatusCode.ORDER_STATUS_CART.ordinal(), Integer.valueOf(productId));
-            orderDetailDao.addOrderDetail(orderId, Integer.valueOf(productId), LimitAmount.FIND_PRODUCT_AMOUNT.ordinal());
+            cartId = orderDao.createOrder(userId, StatusCode.ORDER_STATUS_CART.ordinal(), 0);
+        }
+        Integer detailCount = orderDetailDao.findCountOrderDetailByOrderId(cartId, Integer.valueOf(productId));
+        if (detailCount > 0) {
+            orderDetailDao.incQtyOrderDetailByOrderId(cartId, Integer.valueOf(productId));
         } else {
             orderDetailDao.addOrderDetail(cartId, Integer.valueOf(productId), LimitAmount.FIND_PRODUCT_AMOUNT.ordinal());
-            orderDao.updateOrderTotal(cartId);
         }
+        orderDao.updateOrderTotal(cartId);
     }
 }

@@ -101,10 +101,10 @@ public class OrderDaoImpl implements OrderDao{
         ZonedDateTime now = ZonedDateTime.now(getTimeZone());
         String date = now.format(DateTimeFormatter.ofPattern("yyMMdd"));
         char hour = (char)('A'+now.getHour());
-        String sql ="SELECT COUNT(*) FROM orders WHERE DATE(create_at) = :today AND HOUR(create_at) = :hour";
+        String sql ="SELECT COUNT(*) FROM orders WHERE DATE(create_at) = :today AND order_status = :order_status";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("today", now.toLocalDate());
-        params.addValue("hour", now.getHour());
+        params.addValue("today", now.toLocalDate())
+            .addValue("order_status", StatusCode.ORDER_STATUS_PAID.ordinal());
 
         Integer count = template.queryForObject(sql, params, Integer.class);
         String serialNumber = String.format("%06d", count+1);
@@ -114,7 +114,7 @@ public class OrderDaoImpl implements OrderDao{
 
     @Override
     public OrderDTO findOrderById(Integer id) {
-        String sql = "select * from orders where id=:id";
+        String sql = "SELECT * FROM orders WHERE id=:id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 
@@ -127,7 +127,7 @@ public class OrderDaoImpl implements OrderDao{
 
     @Override
     public Integer updateOrderNoById(Integer id, String orderNo) {
-        String sql = "update orders set order_no = :order_no where id = :id";
+        String sql = "UPDATE orders SET order_no = :order_no WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id)
             .addValue("order_no", orderNo);

@@ -13,4 +13,5 @@ public interface LineBotService {
     Message createButtonsTemplateMessage(ProductDTO productDTO);
     Message createQuickReplyMessage();
     Message createTextMessage(String text);
+    Message createCarouselMessage(List<ProductDTO> dtoList);
 }

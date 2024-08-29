@@ -1,5 +1,6 @@
 package com.example.appbot.service;
 
+import com.example.appbot.dao.OrderDao;
 import com.example.appbot.dao.ProductDao;
 import com.example.appbot.dto.ProductDTO;
 import com.linecorp.bot.model.action.MessageAction;
@@ -14,37 +15,78 @@ import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import com.linecorp.bot.model.message.template.ButtonsTemplate;
 import com.example.appbot.enums.LimitAmount;
+import com.linecorp.bot.model.message.template.CarouselColumn;
+import com.linecorp.bot.model.message.template.CarouselTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class LineBotServiceImpl implements LineBotService {
     @Value("${DOMAIN_NAME_URL}")
     private String DOMAIN_NAME_URL;
+
+    @Value("${web.page.checkout}")
+    private String WEB_PAGE_CHECKOUT;
+
     private static final Logger logger = LoggerFactory.getLogger(LineBotServiceImpl.class);
     private final ProductDao productDao;
     private final S3Service s3Service;
+    private final OrderDao orderDao;
 
-    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service) {
+    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service, OrderDao orderDao) {
         this.productDao = productDao;
         this.s3Service = s3Service;
+        this.orderDao = orderDao;
     }
+
     @Override
     public Message handleTextMessage(MessageEvent<TextMessageContent> event){
         String userMessage = event.getMessage().getText();
         String userId = event.getSource().getUserId();
         if ("想了解".equals(userMessage)) {
             return createQuickReplyMessage();
-        }else if("男裝".equals(userMessage)|| "女裝".equals(userMessage) || "飾品".equals(userMessage)){
+        }else if("男裝".equals(userMessage)|| "女裝".equals(userMessage) || "飾品".equals(userMessage)) {
             // since button template only accept one entry, get the first product
             ProductDTO productDTO = productDao.findProductByCategory(LimitAmount.FIND_PRODUCT_AMOUNT.ordinal(), userMessage).get(0);
             return createButtonsTemplateMessage(productDTO);
-        }else{
+        } else if (userMessage.startsWith("找 ")) {
+            userMessage = userMessage.replace("找 ", "");
+            List<ProductDTO> dtoList = productDao.findProductByKeyword(userMessage);
+            return createCarouselMessage(dtoList);
+        } else if ("結帳".equals(userMessage)) {
+            try {
+                Integer orderId = orderDao.findCartByUserId(userId);
+                if (orderId == null) {
+                    throw new RuntimeException("購物車為空");
+                }
+
+                String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=1", WEB_PAGE_CHECKOUT,userId);
+                return TextMessage.builder()
+                    .text("是否進行結帳")
+                    .quickReply(
+                        QuickReply.builder()
+                            .item(
+                                QuickReplyItem.builder()
+                                    .action(new URIAction("結帳", new URI(checkoutUrl), new URIAction.AltUri(new URI(checkoutUrl))))
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .build();
+            } catch (RuntimeException e) {
+                return new TextMessage(e.getMessage());
+            }
+            catch (Exception e) {
+                return new TextMessage("不可結帳");
+            }
+
+        } else{
             return createTextMessage("請輸入 : 想了解，查看可以搜尋的類別");
         }
     }
@@ -89,5 +131,43 @@ public class LineBotServiceImpl implements LineBotService {
     @Override
     public Message createTextMessage(String text) {
         return new TextMessage(text);
+    }
+
+    @Override
+    public Message createCarouselMessage(List<ProductDTO> dtoList) {
+        if (dtoList.size() == 0) {
+            return new TextMessage("查無此商品");
+        }
+        List<CarouselColumn> colList = new ArrayList<>();
+        dtoList.forEach(dto -> {
+            try {
+                String imageUrl = s3Service.getFileUrl(dto.getImage());
+                String title = dto.getName();
+                String text = dto.getPrice().toString();
+                String productId = dto.getId().toString();
+                colList.add(
+                    CarouselColumn.builder()
+                        .thumbnailImageUrl(new URI(imageUrl))
+                        .title(title)
+                        .text(text)
+                        .actions(
+                            List.of(
+                                new PostbackAction("加入購物車", "action=add_to_cart&product_id="+ productId +"&product_name="+title),
+                                new MessageAction("結帳", "結帳")
+                            )
+                        )
+                        .build()
+                );
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+            }
+        });
+
+        return new TemplateMessage(
+            "查詢商品",
+            CarouselTemplate.builder()
+                .columns(colList)
+                .build()
+        );
     }
 }
