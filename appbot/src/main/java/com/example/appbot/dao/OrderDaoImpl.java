@@ -41,7 +41,7 @@ public class OrderDaoImpl implements OrderDao{
         try {
             return template.queryForObject(sql, params, Integer.class);
         } catch (EmptyResultDataAccessException e) {
-            throw new CheckoutException("帳號錯誤");
+            return null;
         }
     }
     @Override

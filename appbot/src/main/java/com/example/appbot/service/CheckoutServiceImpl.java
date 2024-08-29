@@ -71,17 +71,13 @@ public class CheckoutServiceImpl implements CheckoutService{
     @Override
     @Transactional
     public void handleCheckout(CheckoutRequestDTO crDTO) {
-        log.warn(TAPPAY_PARTNER_KEY);
-        log.warn(TAPPAY_MERCHANT_ID);
         String msg = "";
         String orderNo = "";
         try {
             Integer orderId = orderDao.findCartByUserId(crDTO.getLineUserId());
             OrderDTO orderDTO = orderDao.findOrderById(orderId);
-            log.info(orderDTO);
             if(orderDTO.getOrderNo() == null) {
-                long timestamp = System.currentTimeMillis() % 10000;
-                orderNo = orderDao.getTodaySerialNumber() + timestamp;
+                orderNo = orderDao.getTodaySerialNumber();
                 orderDTO.setOrderNo(orderNo);
                 orderDao.updateOrderNoById(orderId, orderNo);
             } else {
