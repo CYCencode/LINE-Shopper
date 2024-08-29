@@ -13,7 +13,8 @@ import java.time.ZonedDateTime;
 @Builder
 public class OrderDTO {
     private Integer id;
-    private Integer lineUserId;
+    private String orderNo;
+    private String lineUserId;
     private Integer orderStatus;
     private Integer total;
     private ZonedDateTime createAt;

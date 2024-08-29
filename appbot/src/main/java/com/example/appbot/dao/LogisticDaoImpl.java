@@ -19,7 +19,7 @@ public class LogisticDaoImpl implements LogisticDao{
 
     @Override
     public Integer createLogistic(LogisticDTO dto) {
-        String sql = "insert into payments (id, order_id, order_no, status, shipping, allpaylogistic_id, booking_note) values (default, :order_id, :order_no, :status, :shipping, :allpaylogistic_id, :booking_note)";
+        String sql = "insert into logistics (id, order_id, order_no, status, shipping, allpaylogistic_id, booking_note) values (default, :order_id, :order_no, :status, :shipping, :allpaylogistic_id, :booking_note)";
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("order_id", dto.getOrderId())
             .addValue("order_no", dto.getOrderNo())

@@ -1,6 +1,8 @@
 package com.example.appbot.dao;
 
+import com.example.appbot.dto.OrderDTO;
 import com.example.appbot.enums.StatusCode;
+import com.example.appbot.rowmapper.OrderDTORowMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -30,9 +32,11 @@ public class OrderDaoImpl implements OrderDao{
     }
     @Override
     public Integer findCartByUserId(String lineUserId){
-        String sql ="SELECT id FROM orders WHERE line_user_id = :user_id";
+        // 條件: order_status為cart
+        String sql ="SELECT id FROM orders WHERE line_user_id = :user_id and order_status = :order_status";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("user_id", lineUserId);
+        params.addValue("user_id", lineUserId)
+            .addValue("order_status", StatusCode.ORDER_STATUS_CART.ordinal());
         try {
             return template.queryForObject(sql, params, Integer.class);
         } catch (EmptyResultDataAccessException e) {
@@ -107,6 +111,24 @@ public class OrderDaoImpl implements OrderDao{
 
     }
 
+    @Override
+    public OrderDTO findOrderById(Integer id) {
+        String sql = "select * from orders where id=:id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+
+        return template.queryForObject(sql, params, new OrderDTORowMapper());
+    }
+
+    @Override
+    public Integer updateOrderNoById(Integer id, String orderNo) {
+        String sql = "update orders set order_no = :order_no where id = :id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id)
+            .addValue("order_no", orderNo);
+
+        return template.update(sql, params);
+    }
 }
 
 
