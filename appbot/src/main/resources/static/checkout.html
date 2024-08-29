@@ -6,8 +6,10 @@
     <title>Check Out</title>
     <!-- Load TapPay SDK -->
     <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script>
+    <script src="config/config.js"></script>
     <script>
         // Initialize TapPay SDK
+        const confirm_redirect_url = 'https://line.me/R/ti/p/'+line_endpoint;
         const APP_ID = '12348';
         const APP_KEY = 'app_pa1pQcKoY22IlnSXq5m5WP5jFKzoRG58VEXpT7wU62ud7mMbDOGzCYIlzzLF';
         TPDirect.setupSDK(APP_ID, APP_KEY, 'sandbox');
@@ -49,6 +51,22 @@
                 styles: styles
             });
         });
+        function customAlert(message, callback) {
+            const alertDiv = document.createElement('div');
+            alertDiv.id = 'customAlert';
+            alertDiv.innerHTML = `
+                <div class="alert-content">
+                    <p>${message}</p>
+                    <button id="alertConfirm">確認</button>
+                </div>
+            `;
+            document.body.appendChild(alertDiv);
+
+            document.getElementById('alertConfirm').onclick = function() {
+                document.body.removeChild(alertDiv);
+                if (callback) callback();
+            };
+        }
         function onSubmit(){
             // check if from is valid
             if(!validateForm()){
@@ -98,7 +116,9 @@
                             alert("驗證失敗，請輸入有效的信用卡資訊");
                             console.log("Prime 已取得但驗證有問題");
                         }else{
-                            alert("付款成功！");
+                            customAlert("付款成功！", function(){
+                                window.location.href=confirm_redirect_url;
+                            });
                             console.log("Payment post response: ", response.text());
                         }
                     })
@@ -185,6 +205,39 @@
         }
         input.error {
             border: 1px solid red;
+        }
+        #customAlert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .alert-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #alertConfirm {
+            margin-top: 10px;
+            padding: 5px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #alertConfirm:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
