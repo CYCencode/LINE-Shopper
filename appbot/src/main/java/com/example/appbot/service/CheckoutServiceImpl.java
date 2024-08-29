@@ -1,10 +1,11 @@
 package com.example.appbot.service;
 
 import com.example.appbot.dao.*;
-import com.example.appbot.dto.CardHolderDTO;
-import com.example.appbot.dto.CheckoutRequestDTO;
-import com.example.appbot.dto.PayByPrimeDTO;
+import com.example.appbot.dto.*;
+import com.example.appbot.enums.StatusCode;
+import com.example.appbot.exception.CheckoutException;
 import com.example.appbot.util.EncodingUtil;
+import com.example.appbot.util.PostbackDataParser;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.message.TextMessage;
@@ -17,9 +18,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,16 +29,16 @@ import java.util.Map;
 public class CheckoutServiceImpl implements CheckoutService{
 
     @Value("${ecpay.express.create.url}")
-    private String expressCreateURL;
+    private String EXPRESS_CREATE_URL;
 
     @Value("${ecpay.merchant.id}")
-    private String merchantId;
+    private String ECPAY_MERCHANT_ID;
 
     @Value("${ecpay.hash.key}")
-    private String hashKey;
+    private String ECPAY_HASH_KEY;
 
     @Value("${ecpay.hash.iv}")
-    private String hashIV;
+    private String ECPAY_HASH_IV;
 
     @Value("${tappay.sandbox.url}")
     private String TAPPAY_SANDBOX_URL;
@@ -70,78 +71,98 @@ public class CheckoutServiceImpl implements CheckoutService{
 
     @Override
     @Transactional
-    public void handleCheckout(CheckoutRequestDTO dto) {
-        //        Integer orderId = orderDao.findCartByUserId(dto.getLineUserId());
-        //        Integer totalPrice = orderDetailDao.calcCartTotal(orderId);
-        Integer orderId=89;
-        Integer totalPrice=123;
+    public void handleCheckout(CheckoutRequestDTO crDTO) {
+        String msg = "";
+        String orderNo = "";
+        try {
+            Integer orderId = orderDao.findCartByUserId(crDTO.getLineUserId());
+            OrderDTO orderDTO = orderDao.findOrderById(orderId);
+            log.info(orderDTO);
+            if(orderDTO.getOrderNo() == null) {
+                long timestamp = System.currentTimeMillis() % 1000000;
+                orderNo = orderDao.getTodaySerialNumber() + timestamp;
+                orderDTO.setOrderNo(orderNo);
+//                orderDao.updateOrderNoById(orderId, orderNo);
+            } else {
+                orderNo = orderDTO.getOrderNo();
+            }
 
-        verifyLogistic(dto, orderId, totalPrice);
-        verifyPayment(dto, orderId, totalPrice);
-        // updateStatus
-
-        replyUser(dto.getLineUserId(), "123");
+            verifyLogistic(crDTO, orderDTO);
+            verifyPayment(crDTO, orderDTO);
+//            orderDao.updateOrderStatus(orderId, StatusCode.ORDER_STATUS_PAID.ordinal());
+            msg = String.format("訂單 %s 已成立", orderNo);
+        } catch (CheckoutException e) {
+            msg = String.format("訂單 %s %s", orderNo, e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error(String.format("%s %s", orderNo, e.getMessage()));
+            msg = String.format("訂單 %s 交易失敗", orderNo);
+            throw e;
+        } finally {
+            replyUser(crDTO.getLineUserId(), msg);
+        }
     }
 
     @Override
-    public Boolean verifyPayment(CheckoutRequestDTO dto, Integer orderId, Integer totalPrice) {
+    public Boolean verifyPayment(CheckoutRequestDTO crDTO, OrderDTO orderDTO) {
         // tappay
         CardHolderDTO cardHolderDTO = CardHolderDTO.builder()
-            .phoneNumber(dto.getReceiverPhone())
-            .name(dto.getReceiverName())
-            .email(dto.getReceiverEmail())
+            .phoneNumber(crDTO.getReceiverPhone())
+            .name(crDTO.getReceiverName())
+            .email(crDTO.getReceiverEmail())
             .build();
 
         PayByPrimeDTO payByPrimeDto = PayByPrimeDTO.builder()
-            .prime(dto.getPrime())
+            .prime(crDTO.getPrime())
             .partnerKey(TAPPAY_PARTNER_ID)
             .merchantId(TAPPAY_MERCHANT_ID)
-            .amount(totalPrice)
-            .details("")
+            .amount(orderDTO.getTotal())
+            .details(orderDTO.getOrderNo())
             .cardholder(cardHolderDTO)
             .build();
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        headers.set("x-api-key", TAPPAY_PARTNER_ID);
-//
-//        HttpEntity<PayByPrimeDTO> requestEntity = new HttpEntity<>(payByPrimeDto, headers);
-//        ResponseEntity<TappayResultDTO> responseEntity = restTemplate.exchange(TAPPAY_SANDBOX_URL, HttpMethod.POST, requestEntity, TappayResultDTO.class);
-//
-//        TappayResultDTO tappayResultDto = null;
-//        if (responseEntity.hasBody()) {
-//            tappayResultDto = responseEntity.getBody();
-//            if (tappayResultDto.getStatus() != 0) {
-//                throw new RuntimeException("payment");
-//            }
-////            paymentDao.createPayment(orderId, dto.getPaymentMethod());
-//        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("x-api-key", TAPPAY_PARTNER_ID);
+        HttpEntity<PayByPrimeDTO> requestEntity = new HttpEntity<>(payByPrimeDto, headers);
+        ResponseEntity<TappayResultDTO> responseEntity = restTemplate.exchange(TAPPAY_SANDBOX_URL, HttpMethod.POST, requestEntity, TappayResultDTO.class);
+
+        TappayResultDTO tappayResultDto = null;
+        if (responseEntity.hasBody()) {
+            tappayResultDto = responseEntity.getBody();
+            if (tappayResultDto.getStatus() != 0) {
+                log.error(String.format("%s %s", orderDTO.getOrderNo(), tappayResultDto.getMsg()));
+                throw new CheckoutException("付款交易失敗");
+            }
+            log.info(tappayResultDto);
+            paymentDao.createPayment(orderDTO.getId(), crDTO.getPaymentMethod());
+        }
 
         return true;
     }
 
     @Override
-    public Boolean verifyLogistic(CheckoutRequestDTO dto, Integer orderId, Integer totalPrice) {
+    public Boolean verifyLogistic(CheckoutRequestDTO crDTO, OrderDTO orderDTO) {
         // ecpay
         Date date = new Date();
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("GoodsAmount" , totalPrice.toString());
-        map.put("GoodsName" , orderId.toString());
+        map.put("GoodsAmount" , orderDTO.getTotal().toString());
+        map.put("GoodsName" , orderDTO.getOrderNo());
         map.put("LogisticsSubType" , "TCAT");
         map.put("LogisticsType" , "HOME");
-        map.put("MerchantID", merchantId);
+        map.put("MerchantID", ECPAY_MERCHANT_ID);
         map.put("MerchantTradeDate", sdfTradeDate.format(date));
-        map.put("MerchantTradeNo", "BC"+sdfTradeNo.format(date));
-        map.put("ReceiverAddress", dto.getReceiverAddress());
-        map.put("ReceiverCellPhone", dto.getReceiverPhone());
-        map.put("ReceiverName", dto.getReceiverName());
-        map.put("ReceiverZipCode", dto.getReceiverZipcode());
+        map.put("MerchantTradeNo", orderDTO.getOrderNo());
+        map.put("ReceiverAddress", crDTO.getReceiverAddress());
+        map.put("ReceiverCellPhone", crDTO.getReceiverPhone());
+        map.put("ReceiverName", crDTO.getReceiverName());
+        map.put("ReceiverZipCode", crDTO.getReceiverZipcode());
         map.put("SenderAddress", "桃園市八德區介壽路二段148號");
         map.put("SenderCellPhone", "0912345678");
         map.put("SenderName", "Brian");
         map.put("SenderZipCode", "33441");
         map.put("ServerReplyURL", "https://gorgeous-apparent-ape.ngrok-free.app");
-        String CMV = EncodingUtil.getCalculateCMV(map, hashKey, hashIV);
+        String CMV = EncodingUtil.getCalculateCMV(map, ECPAY_HASH_KEY, ECPAY_HASH_IV);
         map.put("CheckMacValue", CMV);
 
         StringBuilder sb = new StringBuilder();
@@ -153,44 +174,34 @@ public class CheckoutServiceImpl implements CheckoutService{
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED.toString());
         HttpEntity<String> requestEntity = new HttpEntity<>(sb.toString(), headers);
-        ResponseEntity<String> response = restTemplate.exchange(expressCreateURL, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(EXPRESS_CREATE_URL, HttpMethod.POST, requestEntity, String.class);
 
-        // parse
+        // parse response and save it to logistics table
         String responseText = response.getBody();
+        log.info(responseText);
         String[] resultArray = responseText.split("\\|");
         String statusCode = resultArray[0];
         if (!statusCode.equals("1")) {
-            throw new RuntimeException("logistic");
+            log.error(String.format("%s %s", orderDTO.getOrderNo(), resultArray[1]));
+            throw new CheckoutException("物流交易失敗");
         }
-        String params = resultArray[1];
-        Map<String, String> paramMap = new HashMap<>();
-        for(String param : params.split("&")) {
-            String[] pair = param.split("=");
-            String key = pair[0];
-            String val = "";
-            if(pair.length > 1) {
-                val = pair[1];
-            }
-            paramMap.put(key,val);
-        }
-
-        log.info(responseText);
-//        logisticDao.createLogistic(
-//            LogisticDTO.builder()
-//                .orderId(orderId)
-//                .orderNo(paramMap.get("MerchantTradeNo"))
-//                .status(paramMap.get("RtoCode"))
-//                .shipping(paramMap.get("LogisticsType"))
-//                .allPayLogisticId(paramMap.get("AllPayLogisticsID"))
-//                .bookingNote(paramMap.get("BookingNote"))
-//                .build()
-//        );
+        Map<String, String> paramMap = PostbackDataParser.parse(resultArray[1]);
+        logisticDao.createLogistic(
+            LogisticDTO.builder()
+                .orderId(orderDTO.getId())
+                .orderNo(paramMap.get("MerchantTradeNo"))
+                .status(paramMap.get("RtoCode"))
+                .shipping(paramMap.get("LogisticsType"))
+                .allPayLogisticId(paramMap.get("AllPayLogisticsID"))
+                .bookingNote(paramMap.get("BookingNote"))
+                .build()
+        );
 
         return true;
     }
 
-    public void replyUser(String lineUserId, String orderNo) {
-        TextMessage textMessage = new TextMessage(String.format("訂單 %s 已成立", orderNo));
+    public void replyUser(String lineUserId, String msg) {
+        TextMessage textMessage = new TextMessage(msg);
         PushMessage pushMessage = new PushMessage(lineUserId, textMessage);
         lineMessagingClient.pushMessage(pushMessage);
     }

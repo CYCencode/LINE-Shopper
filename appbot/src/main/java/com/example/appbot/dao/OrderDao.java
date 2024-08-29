@@ -1,5 +1,6 @@
 package com.example.appbot.dao;
 
+import com.example.appbot.dto.OrderDTO;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 public interface OrderDao {
@@ -8,4 +9,6 @@ public interface OrderDao {
     Integer updateOrderTotal(Integer cartId);
     Integer updateOrderStatus(Integer cartId,Integer orderStatus);
     String getTodaySerialNumber();
+    OrderDTO findOrderById(Integer id);
+    Integer updateOrderNoById(Integer id, String orderNo);
 }
