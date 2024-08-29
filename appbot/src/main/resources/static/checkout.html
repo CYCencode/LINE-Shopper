@@ -67,6 +67,11 @@
                 }
                 // get prime
                 const prime = result.card.prime;
+                const receiver_name = document.getElementById('receiver_name').value;
+                const receiver_phone = document.getElementById('receiver_phone').value;
+                const receiver_address = document.getElementById('receiver_address').value;
+                const receiver_zipcode = document.getElementById('receiver_zipcode').value;
+                const receiver_email = document.getElementById('receiver_email').value;
                 console.log("Prime : "+prime);
                 // order data
                 const order_data = {
@@ -86,7 +91,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(orderData)
+                    body: JSON.stringify(order_data)
                 })
                     .then(response=>{
                         if(!response.ok){
@@ -106,7 +111,7 @@
         function validateField(field, pattern, errorMessage) {
             const value = field.value;
             const isValid = pattern.test(value);
-            const errorElement = document.getElementById(field.id + '-error');
+            const errorElement = document.getElementById(field.id + '_error');
 
             if (!isValid) {
                 field.classList.add('error');
@@ -122,27 +127,27 @@
         function validateForm() {
             const fields = [
                 {
-                    id: 'recipient-name',
+                    id: 'receiver_name',
                     pattern: /^[\u4e00-\u9fa5]{2,5}$/,
                     errorMessage: "收件人姓名必須是2-5個中文字，不可以帶數字與特殊符號"
                 },
                 {
-                    id: 'recipient-phone',
+                    id: 'receiver_phone',
                     pattern: /^09\d{8}$/,
                     errorMessage: "收件人電話必須是09開頭的10位數字"
                 },
                 {
-                    id: 'recipient-address',
+                    id: 'receiver_address',
                     pattern: /^[\u4e00-\u9fa5]{6,60}$/,
                     errorMessage: "收件人地址必須是6-60個中文字"
                 },
                 {
-                    id: 'recipient-zipcode',
+                    id: 'receiver_zipcode',
                     pattern: /^\d{1,6}$/,
                     errorMessage: "收件人郵遞區號必須是6位內的數字"
                 },
                 {
-                    id: 'recipient-email',
+                    id: 'receiver_email',
                     pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                     errorMessage: "請輸入有效的電子郵件地址"
                 }
@@ -206,29 +211,29 @@
 <div>
     <h3>黑貓宅配資訊</h3>
     <div>
-        <label for="recipient-name">收件人姓名</label>
-        <input type="text" id="recipient-name" placeholder="請輸入收件人姓名" required />
-        <div id="recipient-name-error" class="error-message"></div>
+        <label for="receiver_name">收件人姓名</label>
+        <input type="text" id="receiver_name" name="receiver_name" placeholder="請輸入收件人姓名" required />
+        <div id="receiver_name_error" class="error-message"></div>
     </div>
     <div>
-        <label for="recipient-phone">收件人電話</label>
-        <input type="text" id="recipient-phone" placeholder="請輸入收件人電話" required />
-        <div id="recipient-phone-error" class="error-message"></div>
+        <label for="receiver_phone">收件人電話</label>
+        <input type="text" id="receiver_phone" name="receiver_phone" placeholder="請輸入收件人電話" required />
+        <div id="receiver_phone_error" class="error-message"></div>
     </div>
     <div>
-        <label for="recipient-address">收件人地址</label>
-        <input type="text" id="recipient-address" placeholder="請輸入收件人地址" required />
-        <div id="recipient-address-error" class="error-message"></div>
+        <label for="receiver_address">收件人地址</label>
+        <input type="text" id="receiver_address" name="receiver_address" placeholder="請輸入收件人地址" required />
+        <div id="receiver_address_error" class="error-message"></div>
     </div>
     <div>
-        <label for="recipient-zipcode">收件人郵遞區號</label>
-        <input type="text" id="recipient-zipcode" placeholder="請輸入郵遞區號" required />
-        <div id="recipient-zipcode-error" class="error-message"></div>
+        <label for="receiver_zipcode">收件人郵遞區號</label>
+        <input type="text" id="receiver_zipcode" name="receiver_zipcode" placeholder="請輸入郵遞區號" required />
+        <div id="receiver_zipcode_error" class="error-message"></div>
     </div>
     <div>
-        <label for="recipient-email">收件人電子郵件</label>
-        <input type="email" id="recipient-email" placeholder="請輸入電子郵件" required />
-        <div id="recipient-email-error" class="error-message"></div>
+        <label for="receiver_email">收件人電子郵件</label>
+        <input type="email" id="receiver_email" name="receiver_email" placeholder="請輸入電子郵件" required />
+        <div id="receiver_email_error" class="error-message"></div>
     </div>
 </div>
 <button onclick="onSubmit()">結帳</button>
