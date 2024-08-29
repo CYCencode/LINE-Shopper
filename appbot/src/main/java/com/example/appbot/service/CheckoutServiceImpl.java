@@ -18,7 +18,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -43,8 +42,8 @@ public class CheckoutServiceImpl implements CheckoutService{
     @Value("${tappay.sandbox.url}")
     private String TAPPAY_SANDBOX_URL;
 
-    @Value("${tappay.partner.id}")
-    private String TAPPAY_PARTNER_ID;
+    @Value("${tappay.partner.key}")
+    private String TAPPAY_PARTNER_KEY;
 
     @Value("${tappay.merchant.id}")
     private String TAPPAY_MERCHANT_ID;
@@ -72,6 +71,8 @@ public class CheckoutServiceImpl implements CheckoutService{
     @Override
     @Transactional
     public void handleCheckout(CheckoutRequestDTO crDTO) {
+        log.warn(TAPPAY_PARTNER_KEY);
+        log.warn(TAPPAY_MERCHANT_ID);
         String msg = "";
         String orderNo = "";
         try {
@@ -114,7 +115,7 @@ public class CheckoutServiceImpl implements CheckoutService{
 
         PayByPrimeDTO payByPrimeDto = PayByPrimeDTO.builder()
             .prime(crDTO.getPrime())
-            .partnerKey(TAPPAY_PARTNER_ID)
+            .partnerKey(TAPPAY_PARTNER_KEY)
             .merchantId(TAPPAY_MERCHANT_ID)
             .amount(orderDTO.getTotal())
             .details(orderDTO.getOrderNo())
@@ -123,7 +124,7 @@ public class CheckoutServiceImpl implements CheckoutService{
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("x-api-key", TAPPAY_PARTNER_ID);
+        headers.set("x-api-key", TAPPAY_PARTNER_KEY);
         HttpEntity<PayByPrimeDTO> requestEntity = new HttpEntity<>(payByPrimeDto, headers);
         ResponseEntity<TappayResultDTO> responseEntity = restTemplate.exchange(TAPPAY_SANDBOX_URL, HttpMethod.POST, requestEntity, TappayResultDTO.class);
 
@@ -180,8 +181,8 @@ public class CheckoutServiceImpl implements CheckoutService{
         String responseText = response.getBody();
         log.info(responseText);
         String[] resultArray = responseText.split("\\|");
-        String statusCode = resultArray[0];
-        if (!statusCode.equals("1")) {
+        Integer statusCode = Integer.parseInt(resultArray[0]);
+        if (!statusCode.equals(1)) {
             log.error(String.format("%s %s", orderDTO.getOrderNo(), resultArray[1]));
             throw new CheckoutException("物流交易失敗");
         }
