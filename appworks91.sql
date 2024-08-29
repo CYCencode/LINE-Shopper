@@ -24,8 +24,8 @@ DROP TABLE IF EXISTS `campaigns`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `campaigns` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `create_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `terminate_at` timestamp NULL DEFAULT NULL,
+  `create_at` datetime DEFAULT NULL,
+  `terminate_at` datetime DEFAULT NULL,
   `discount_rate` decimal(10,0) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -109,11 +109,12 @@ DROP TABLE IF EXISTS `orders`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `orders` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(20) DEFAULT NULL,
   `line_user_id` varchar(33) NOT NULL,
   `order_status` int DEFAULT NULL,
   `total` int DEFAULT NULL,
-  `create_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_modify_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_at` datetime DEFAULT NULL,
+  `last_modify_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -191,4 +192,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-08-27 21:11:08
+-- Dump completed on 2024-08-29 11:52:29

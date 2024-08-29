@@ -12,6 +12,8 @@ public class PostbackDataParser {
             String[] keyValue = pair.split("=");
             if (keyValue.length == 2) {
                 result.put(keyValue[0], keyValue[1]);
+            } else if (keyValue.length == 1) {
+                result.put(keyValue[0], "");
             }
         }
         return result;
