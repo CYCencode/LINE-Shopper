@@ -111,15 +111,16 @@
                     },
                     body: JSON.stringify(order_data)
                 })
-                    .then(response=>{
-                        if(!response.ok){
-                            alert("驗證失敗，請輸入有效的信用卡資訊");
-                            console.log("Prime 已取得但驗證有問題");
-                        }else{
-                            customAlert("付款成功！", function(){
+                    .then(response=> response.json())
+                    .then(data => {
+                        if(data.success){
+                            customAlert(data.msg, function(){
                                 window.location.href=confirm_redirect_url;
                             });
                             console.log("Payment post response: ", response.text());
+                        }
+                        else{
+                            alert(data.msg);
                         }
                     })
                     .catch(error=>{
@@ -148,8 +149,8 @@
             const fields = [
                 {
                     id: 'receiver_name',
-                    pattern: /^[\u4e00-\u9fa5]{2,5}$/,
-                    errorMessage: "收件人姓名必須是2-5個中文字，不可以帶數字與特殊符號"
+                    pattern: /^([\u4e00-\u9fa5]{2,5}|[a-zA-Z]{4,10})$/,
+                    errorMessage: "收件人姓名必須是2-5個中文字或4-10個半形英文字符，不可以帶數字與特殊符號"
                 },
                 {
                     id: 'receiver_phone',
