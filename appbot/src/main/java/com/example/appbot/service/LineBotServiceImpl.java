@@ -40,7 +40,7 @@ import java.util.List;
 public class LineBotServiceImpl implements LineBotService {
     @Value("${LINE_PROFILE_URL}")
     private String LINE_PROFILE_URL;
-    @Value("${CHANNEL_ACCESS_TOKEN}")
+    @Value("${line.bot.channel-token}")
     private String CHANNEL_ACCESS_TOKEN;
     @Value("${web.page.checkout}")
     private String WEB_PAGE_CHECKOUT;
