@@ -93,7 +93,7 @@ CREATE TABLE `order_details` (
   KEY `product_id` (`product_id`),
   KEY `campaign_id` (`campaign_id`),
   CONSTRAINT `order_details_ibfk_1` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
