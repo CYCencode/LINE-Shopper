@@ -1,8 +1,5 @@
 package com.example.appbot.handler;
 
-import com.example.appbot.dao.OrderDao;
-import com.example.appbot.dao.OrderDetailDao;
-import com.example.appbot.enums.LimitAmount;
 import com.example.appbot.service.LineBotService;
 import com.example.appbot.service.OrderService;
 import com.example.appbot.util.PostbackDataParser;
@@ -16,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.appbot.enums.StatusCode;
 import org.springframework.stereotype.Component;
-
 import java.util.Map;
 
 @Component
@@ -46,10 +42,14 @@ public class LineBotMessageHandler {
 
         if ("add_to_cart".equals(actionValue)) {
             orderService.addToCart(userId, productId);
-            return lineBotService.createTextMessage(productName + " 已加入購物車");
+            lineBotService.pushTextMessage(userId, productName + " 已加入購物車");
+            Message cartButtonMessage = lineBotService.createCartButtonTemplate(userId);
+            return cartButtonMessage;
         }
         return null;
     }
+
+
 }
 
 

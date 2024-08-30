@@ -1,9 +1,12 @@
 package com.example.appbot.dao;
 
 import com.example.appbot.dto.OrderDTO;
+import com.example.appbot.dto.OrderDetailDTO;
 import com.example.appbot.enums.StatusCode;
 import com.example.appbot.exception.CheckoutException;
 import com.example.appbot.rowmapper.OrderDTORowMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Repository
 public class OrderDaoImpl implements OrderDao{
@@ -23,6 +27,7 @@ public class OrderDaoImpl implements OrderDao{
     private final NamedParameterJdbcTemplate template;
     private final ProductDao productDao;
     private final OrderDetailDao orderDetailDao;
+    private static final Logger logger = LoggerFactory.getLogger(OrderDaoImpl.class);
     public OrderDaoImpl(NamedParameterJdbcTemplate template, ProductDao productDao, OrderDetailDao orderDetailDao) {
         this.template = template;
         this.productDao = productDao;
@@ -33,7 +38,6 @@ public class OrderDaoImpl implements OrderDao{
     }
     @Override
     public Integer findCartByUserId(String lineUserId){
-        // 條件: order_status為cart
         String sql ="SELECT id FROM orders WHERE line_user_id = :user_id and order_status = :order_status";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("user_id", lineUserId)
@@ -45,18 +49,17 @@ public class OrderDaoImpl implements OrderDao{
         }
     }
     @Override
-    public Integer createOrder(String lineUserId, Integer orderStatus, Integer productId){
-        /*TODO: since we only add one order once a time,
-           future need to init total as 0, calculate total & update total
-         */
-        Integer price = productDao.findProductPrice(productId);
+    public Integer createOrder(String lineUserId, String lineUserName, Integer orderStatus){
         ZonedDateTime currentTime = ZonedDateTime.now(getTimeZone());
-        String sql = "INSERT INTO orders (line_user_id, order_status, total, create_at, last_modify_at) " +
-                "VALUES (:line_user_id, :order_status, :total, :currentTime, :currentTime)";
+        String order_no = getTodaySerialNumber();
+        String sql = "INSERT INTO orders (line_user_id, order_no, line_user_name ,order_status, total, create_at, last_modify_at) " +
+                "VALUES (:line_user_id, :order_no ,:line_user_name , :order_status, :total, :currentTime, :currentTime)";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("line_user_id", lineUserId);
+        params.addValue("order_no", order_no);
+        params.addValue("line_user_name", lineUserName);
         params.addValue("order_status", orderStatus);
-        params.addValue("total", price);
+        params.addValue("total", 0);
         params.addValue("currentTime", currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         KeyHolder keyHolder = new GeneratedKeyHolder();
         template.update(sql, params, keyHolder, new String[] {"id"});
@@ -65,36 +68,32 @@ public class OrderDaoImpl implements OrderDao{
     }
 
     @Override
-    public Integer updateOrderTotal(Integer cartId){
-        Integer total = orderDetailDao.calcCartTotal(cartId);
+    public List<OrderDetailDTO> updateOrderTotal(Integer cartId) {
+        List<OrderDetailDTO> orderDetails = orderDetailDao.calcCartTotal(cartId);
+        Integer total = orderDetails.stream()
+                .mapToInt(detail -> detail.getDiscountedPrice() * detail.getQuantity())
+                .sum();
+        logger.info(String.format("Total : %d", total));
         String sql = "UPDATE orders SET total = :total WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", cartId);
         params.addValue("total", total);
-        return template.update(sql, params);
+        template.update(sql, params);
+
+        return orderDetails;
     }
+
 
     @Override
     public Integer updateOrderStatus(Integer cartId, Integer orderStatus) {
         ZonedDateTime currentTime = ZonedDateTime.now(getTimeZone());
         MapSqlParameterSource params = new MapSqlParameterSource();
-        StringBuilder sql = new StringBuilder("UPDATE orders SET order_status = :status, last_modify_at = :lastModifyAt");
+        String sql = "UPDATE orders SET order_status = :status, last_modify_at = :lastModifyAt WHERE id = :id";
         params.addValue("status", orderStatus);
         params.addValue("id", cartId);
         params.addValue("lastModifyAt", currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
-        if (orderStatus == StatusCode.ORDER_STATUS_PAID.ordinal()) {
-            String order_no = getTodaySerialNumber();
-            params.addValue("order_no", order_no);
-            sql.append(", order_no = :order_no");
-        }
-
-        sql.append(" WHERE id = :id");
-        return template.update(sql.toString(), params);
+        return template.update(sql, params);
     }
-    /*
-    TODO: consider database timezone vs. ZonedDateTime
-     */
 
     @Override
     public String getTodaySerialNumber(){

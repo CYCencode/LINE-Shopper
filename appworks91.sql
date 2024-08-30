@@ -24,11 +24,15 @@ DROP TABLE IF EXISTS `campaigns`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `campaigns` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `campaign_name` varchar(30) DEFAULT NULL,
   `create_at` datetime DEFAULT NULL,
   `terminate_at` datetime DEFAULT NULL,
-  `discount_rate` decimal(10,0) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `discount_rate` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `campaigns_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,6 +41,7 @@ CREATE TABLE `campaigns` (
 
 LOCK TABLES `campaigns` WRITE;
 /*!40000 ALTER TABLE `campaigns` DISABLE KEYS */;
+INSERT INTO `campaigns` VALUES (1,20,'1折優惠','2024-08-30 07:00:00','2024-12-31 23:59:59',0.10),(2,20,'1折優惠','2024-08-30 07:00:00','2024-12-31 23:59:59',0.10),(3,14,'5折優惠','2024-08-30 07:00:00','2024-12-31 23:59:59',0.50),(4,15,'5折優惠','2024-08-30 07:00:00','2024-12-31 23:59:59',0.50);
 /*!40000 ALTER TABLE `campaigns` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,7 +93,7 @@ CREATE TABLE `order_details` (
   KEY `product_id` (`product_id`),
   KEY `campaign_id` (`campaign_id`),
   CONSTRAINT `order_details_ibfk_1` FOREIGN KEY (`campaign_id`) REFERENCES `campaigns` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -111,12 +116,13 @@ CREATE TABLE `orders` (
   `id` int NOT NULL AUTO_INCREMENT,
   `order_no` varchar(20) DEFAULT NULL,
   `line_user_id` varchar(33) NOT NULL,
+  `line_user_name` varchar(20) NOT NULL,
   `order_status` int DEFAULT NULL,
   `total` int DEFAULT NULL,
   `create_at` datetime DEFAULT NULL,
   `last_modify_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -192,4 +198,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-08-29 11:52:29
+-- Dump completed on 2024-08-30  9:22:46

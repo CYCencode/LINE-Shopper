@@ -3,6 +3,9 @@ package com.example.appbot.service;
 import com.example.appbot.dao.OrderDao;
 import com.example.appbot.dao.ProductDao;
 import com.example.appbot.dto.ProductDTO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.action.URIAction;
@@ -20,7 +23,14 @@ import com.linecorp.bot.model.message.template.CarouselTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,9 +38,10 @@ import java.util.List;
 
 @Service
 public class LineBotServiceImpl implements LineBotService {
-    @Value("${DOMAIN_NAME_URL}")
-    private String DOMAIN_NAME_URL;
-
+    @Value("${LINE_PROFILE_URL}")
+    private String LINE_PROFILE_URL;
+    @Value("${CHANNEL_ACCESS_TOKEN}")
+    private String CHANNEL_ACCESS_TOKEN;
     @Value("${web.page.checkout}")
     private String WEB_PAGE_CHECKOUT;
 
@@ -38,11 +49,16 @@ public class LineBotServiceImpl implements LineBotService {
     private final ProductDao productDao;
     private final S3Service s3Service;
     private final OrderDao orderDao;
-
-    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service, OrderDao orderDao) {
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+    private final LineMessagingClient lineMessagingClient;
+    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service, OrderDao orderDao, RestTemplate restTemplate, ObjectMapper objectMapper, LineMessagingClient lineMessagingClient) {
         this.productDao = productDao;
         this.s3Service = s3Service;
         this.orderDao = orderDao;
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+        this.lineMessagingClient = lineMessagingClient;
     }
 
     @Override
@@ -52,13 +68,14 @@ public class LineBotServiceImpl implements LineBotService {
         if ("想了解".equals(userMessage)) {
             return createQuickReplyMessage();
         }else if("男裝".equals(userMessage)|| "女裝".equals(userMessage) || "飾品".equals(userMessage)) {
-            // since button template only accept one entry, get the first product
             ProductDTO productDTO = productDao.findProductByCategory(LimitAmount.FIND_PRODUCT_AMOUNT.ordinal(), userMessage).get(0);
-            return createButtonsTemplateMessage(productDTO);
+            return createProductButtonsTemplate(productDTO);
         } else if (userMessage.startsWith("找 ")) {
             userMessage = userMessage.replace("找 ", "");
             List<ProductDTO> dtoList = productDao.findProductByKeyword(userMessage);
             return createCarouselMessage(dtoList);
+        } else if ("查看購物車".equals(userMessage)) {
+            return createCartButtonTemplate(userId);
         } else if ("結帳".equals(userMessage)) {
             try {
                 Integer orderId = orderDao.findCartByUserId(userId);
@@ -108,7 +125,7 @@ public class LineBotServiceImpl implements LineBotService {
     }
 
     @Override
-    public Message createButtonsTemplateMessage(ProductDTO productDTO) {
+    public Message createProductButtonsTemplate(ProductDTO productDTO) {
         String imageUrl = s3Service.getFileUrl(productDTO.getImage());
         String title = productDTO.getName();
         String text = productDTO.getPrice().toString();
@@ -129,9 +146,31 @@ public class LineBotServiceImpl implements LineBotService {
         }
     }
     @Override
+    public Message createCartButtonTemplate(String userId) {
+        String cartUrl = String.format("%s?line_user_id=%s", WEB_PAGE_CHECKOUT, userId);
+        URIAction cartAction = new URIAction("查看購物車", URI.create(cartUrl), new URIAction.AltUri(URI.create(cartUrl)));
+
+        ButtonsTemplate buttonsTemplate = new ButtonsTemplate(
+                null,
+                "商品已加入購物車！",
+                "您可以查看您的購物車",
+                Arrays.asList(cartAction)
+        );
+
+        return new TemplateMessage("查看購物車", buttonsTemplate);
+    }
+
+    @Override
     public Message createTextMessage(String text) {
         return new TextMessage(text);
     }
+    @Override
+    public void pushTextMessage(String userId, String text) {
+        TextMessage textMessage = new TextMessage(text);
+        PushMessage pushMessage = new PushMessage(userId, textMessage);
+        lineMessagingClient.pushMessage(pushMessage);
+    }
+
 
     @Override
     public Message createCarouselMessage(List<ProductDTO> dtoList) {
@@ -169,5 +208,20 @@ public class LineBotServiceImpl implements LineBotService {
                 .columns(colList)
                 .build()
         );
+    }
+    @Override
+    public String getUserProfile(String userId) {
+        String url = LINE_PROFILE_URL + userId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + CHANNEL_ACCESS_TOKEN);
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+        try {
+            JsonNode rootNode = objectMapper.readTree(response.getBody());
+            return rootNode.path("displayName").asText();
+        } catch (Exception e) {
+            logger.error("Error parsing user profile: ", e);
+            return "";
+        }
     }
 }

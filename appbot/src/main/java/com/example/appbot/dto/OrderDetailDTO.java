@@ -15,4 +15,6 @@ public class OrderDetailDTO {
     private Integer orderId;
     private Integer productId;
     private Integer campaignId;
+    private Integer originalPrice;
+    private Integer discountedPrice;
 }
