@@ -86,7 +86,7 @@ public class LineBotServiceImpl implements LineBotService {
             return createCarouselMessage(dtoList);
         } else if ("查看購物車".equals(userMessage)) {
             return createCartQuickReplyMessage(userId, " 點擊按鈕查看您的購物車");
-        }else if (userMessage.startsWith("STC") && userMessage.length() == 16) {
+        }else if (userMessage.startsWith("ST") && userMessage.length() == 16) {
             String orderNo = userMessage;
             return createSearchOrderTextMessage(orderNo);
         }
