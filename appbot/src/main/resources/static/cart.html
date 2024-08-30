@@ -55,14 +55,19 @@
                     cartItem.className = 'cart-item';
 
                     cartItem.innerHTML = `
-                            <img src="${item.productImage}" alt="${item.productName}">
-                            <div class="cart-item-details">
-                                <h3>${item.productName}</h3>
-                                <p>數量: ${item.quantity}</p>
-                                <p>原價: ${item.originalPrice} 元</p>
-                                <p>折扣價: ${item.discountedPrice} 元</p>
-                            </div>
-                        `;
+                        <img src="${item.productImage}" alt="${item.productName}">
+                        <div class="cart-item-details">
+                            <h3>${item.productName}</h3>
+                            <p>數量: ${item.quantity}</p>
+                            ${
+                                            item.discountedPrice < item.originalPrice
+                                                ? `<p>原價: <s>${item.originalPrice} 元</s></p>
+                                   <p>折扣價: ${item.discountedPrice} 元</p>`
+                                                : `<p>價格: ${item.originalPrice} 元</p>`
+                                        }
+                            <p>商品小計: ${item.discountedPrice * item.quantity} 元</p>
+                        </div>
+                    `;
 
                     cartItemsContainer.appendChild(cartItem);
                 });
