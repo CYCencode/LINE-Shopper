@@ -27,6 +27,7 @@ public class LineBotMessageHandler {
     }
     @EventMapping
     public Message handleMessageEvent(MessageEvent<TextMessageContent> event){
+        logger.info("Handling message event: {}", event);
         return lineBotService.handleTextMessage(event);
 
     }
