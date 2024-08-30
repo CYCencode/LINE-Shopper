@@ -31,11 +31,14 @@ public class CheckoutController {
             if (orderId != null) {
                 checkoutService.handleCheckout(dto);
                 map.put("success", true);
+                map.put("msg", "付款成功");
             } else {
                 map.put("success", false);
+                map.put("msg", "購物車為空");
             }
         } catch (Exception e) {
             map.put("success", false);
+            map.put("msg", e.getMessage());
         }
         return ResponseEntity.ok(map);
     }
