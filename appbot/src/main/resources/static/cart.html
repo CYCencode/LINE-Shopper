@@ -3,33 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>查詢購物車</title>
-    <link rel="stylesheet" href="/admin/order.css">
+    <title>購物車</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .cart-item img {
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+        }
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        .total-amount {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <main>
-        <div class="mainContainer">
-            <table>
-                <thead>
-                <tr>
-                    <th>商品名稱</th>
-                    <th>商品單價</th>
-                    <th>商品折扣單價</th>
-                    <th>打折優惠</th>
-                    <th>商品數量</th>
-                </tr>
-                </thead>
-                <tbody id="orderTable">
-                    <tr>
-                        <td>褲子</td>
-                        <td>$1</td>
-                        <td>$1</td>
-                        <td>0%</td>
-                        <td>1</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </main>
+<h1>我的購物車</h1>
+<div id="cart-items"></div>
+<div class="total-amount">
+    總金額: <span id="total-price">0</span> 元
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        // get params from URL
+        const url_params = new URLSearchParams(window.location.search);
+        const cart_id = url_params.get('cart_id');
+        fetch(`api/v1/orderDetail/search?order_id=${cart_id}`)
+            .then(response => response.json())
+            .then(data=>{
+                let totalAmount = 0;
+                const cartItemsContainer = document.getElementById('cart-items');
+
+                data.forEach(item => {
+                    // 計算總金額
+                    totalAmount += item.discountedPrice * item.quantity;
+
+                    // 創建商品項目元素
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+
+                    cartItem.innerHTML = `
+                            <img src="${item.productImage}" alt="${item.productName}">
+                            <div class="cart-item-details">
+                                <h3>${item.productName}</h3>
+                                <p>數量: ${item.quantity}</p>
+                                <p>原價: ${item.originalPrice} 元</p>
+                                <p>折扣價: ${item.discountedPrice} 元</p>
+                            </div>
+                        `;
+
+                    cartItemsContainer.appendChild(cartItem);
+                });
+
+                // 顯示總金額
+                document.getElementById('total-price').textContent = totalAmount;
+            })
+            .catch(error => {
+                console.error('Error fetching order details:', error);
+            });
+    });
+    </script>
+
 </body>
 </html>

@@ -94,7 +94,7 @@ public class OrderDetailDaoImpl implements OrderDetailDao {
 
     @Override
     public List<OrderDetailDTO> findOrderDetailListByOrderId(Integer orderId) {
-        String sql = "SELECT od.id, od.product_id, od.order_id, od.campaign_id, od.quantity, p.name AS productName, " +
+        String sql = "SELECT od.id, od.product_id, od.order_id, od.campaign_id, od.quantity, p.name AS productName, p.image AS productImage, " +
             "p.price AS originalPrice, " +
             "CASE WHEN od.campaign_id IS NOT NULL THEN p.price * c.discount_rate ELSE p.price END AS discountedPrice " +
             "FROM order_details od " +
@@ -112,6 +112,7 @@ public class OrderDetailDaoImpl implements OrderDetailDao {
                     .campaignId(rs.getInt("campaign_id"))
                     .productId(rs.getInt("product_id"))
                     .productName(rs.getString("productName"))
+                    .productImage(rs.getString("productImage"))
                     .quantity(rs.getInt("quantity"))
                     .originalPrice(rs.getInt("originalPrice")) // 自動取整
                     .discountedPrice(rs.getInt("discountedPrice"))

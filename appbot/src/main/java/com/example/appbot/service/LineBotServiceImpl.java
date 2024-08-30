@@ -149,7 +149,8 @@ public class LineBotServiceImpl implements LineBotService {
     }
     @Override
     public Message createCartQuickReplyMessage(String userId, String text) {
-        String cartUrl = String.format("%s?line_user_id=%s", WEB_PAGE_CART, userId);
+        Integer cartId = orderDao.findOrderByUserId(userId);
+        String cartUrl = String.format("%s?cart_id=%s", WEB_PAGE_CART, cartId);
 
         QuickReply quickReply = QuickReply.items(
                 Arrays.asList(

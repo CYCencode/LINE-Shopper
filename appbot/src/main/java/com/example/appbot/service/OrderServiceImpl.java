@@ -17,13 +17,15 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDao orderDao;
     private final OrderDetailDao orderDetailDao;
     private final LineBotService lineBotService;
+    private final S3Service s3Service;
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
 
-    public OrderServiceImpl(OrderDao orderDao, OrderDetailDao orderDetailDao, LineBotService lineBotService) {
+    public OrderServiceImpl(OrderDao orderDao, OrderDetailDao orderDetailDao, LineBotService lineBotService, S3Service s3Service) {
         this.orderDao = orderDao;
         this.orderDetailDao = orderDetailDao;
         this.lineBotService = lineBotService;
+        this.s3Service = s3Service;
     }
 
     @Override
@@ -60,6 +62,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDetailDTO> findOrderDetailListByOrderId(Integer orderId) {
-        return orderDetailDao.findOrderDetailListByOrderId(orderId);
+        List<OrderDetailDTO> orderDetailDTO = orderDetailDao.findOrderDetailListByOrderId(orderId);
+        // add s3 prefix
+        orderDetailDTO.forEach(dto -> {dto.setProductImage(s3Service.getFileUrl(dto.getProductImage()));});
+        return orderDetailDTO;
     }
 }
