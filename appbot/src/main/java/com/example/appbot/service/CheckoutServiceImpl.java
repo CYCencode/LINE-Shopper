@@ -127,12 +127,13 @@ public class CheckoutServiceImpl implements CheckoutService{
         TappayResultDTO tappayResultDto = null;
         if (responseEntity.hasBody()) {
             tappayResultDto = responseEntity.getBody();
+            log.info(tappayResultDto);
             if (tappayResultDto.getStatus() != 0) {
                 log.error(String.format("%s %s", orderDTO.getOrderNo(), tappayResultDto.getMsg()));
                 throw new CheckoutException("付款交易失敗");
             }
             log.info(tappayResultDto);
-            paymentDao.createPayment(orderDTO.getId(), crDTO.getPaymentMethod());
+            paymentDao.createPayment(orderDTO.getId(), crDTO.getPaymentMethod(), tappayResultDto);
         }
 
         return true;
