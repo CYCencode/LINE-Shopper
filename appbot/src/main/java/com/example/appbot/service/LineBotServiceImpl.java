@@ -59,8 +59,9 @@ public class LineBotServiceImpl implements LineBotService {
     private final LogisticDao logisticDao;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final RichMenuService richMenuService;
     private final LineMessagingClient lineMessagingClient;
-    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service, OrderDao orderDao, OrderDetailDao orderDetailDao, LogisticDao logisticDao, RestTemplate restTemplate, ObjectMapper objectMapper, LineMessagingClient lineMessagingClient) {
+    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service, OrderDao orderDao, OrderDetailDao orderDetailDao, LogisticDao logisticDao, RestTemplate restTemplate, ObjectMapper objectMapper, RichMenuService richMenuService, LineMessagingClient lineMessagingClient) {
         this.productDao = productDao;
         this.s3Service = s3Service;
         this.orderDao = orderDao;
@@ -68,6 +69,7 @@ public class LineBotServiceImpl implements LineBotService {
         this.logisticDao = logisticDao;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.richMenuService = richMenuService;
         this.lineMessagingClient = lineMessagingClient;
     }
 
@@ -86,6 +88,8 @@ public class LineBotServiceImpl implements LineBotService {
             return createCarouselMessage(dtoList);
         } else if ("查看購物車".equals(userMessage)) {
             return createCartQuickReplyMessage(userId, " 點擊按鈕查看您的購物車");
+        } else if ("限時促銷".equals(userMessage)) {
+            return richMenuService.createCampaignFlexMessage();
         }else if (userMessage.startsWith("ST") && userMessage.length() == 15) {
             String orderNo = userMessage;
             return createSearchOrderTextMessage(orderNo);
@@ -99,17 +103,17 @@ public class LineBotServiceImpl implements LineBotService {
 
                 String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s", WEB_PAGE_CHECKOUT,userId, orderId);
                 return TextMessage.builder()
-                    .text("是否進行結帳")
-                    .quickReply(
-                        QuickReply.builder()
-                            .item(
-                                QuickReplyItem.builder()
-                                    .action(new URIAction("結帳", new URI(checkoutUrl), new URIAction.AltUri(new URI(checkoutUrl))))
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .build();
+                        .text("是否進行結帳")
+                        .quickReply(
+                                QuickReply.builder()
+                                        .item(
+                                                QuickReplyItem.builder()
+                                                        .action(new URIAction("結帳", new URI(checkoutUrl), new URIAction.AltUri(new URI(checkoutUrl))))
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                        .build();
             } catch (RuntimeException e) {
                 return new TextMessage(e.getMessage());
             }
@@ -228,17 +232,17 @@ public class LineBotServiceImpl implements LineBotService {
                 String text = dto.getPrice().toString();
                 String productId = dto.getId().toString();
                 colList.add(
-                    CarouselColumn.builder()
-                        .thumbnailImageUrl(new URI(imageUrl))
-                        .title(title)
-                        .text(text)
-                        .actions(
-                            List.of(
-                                new PostbackAction("加入購物車", "action=add_to_cart&product_id="+ productId +"&product_name="+title),
-                                new MessageAction("結帳", "結帳")
-                            )
-                        )
-                        .build()
+                        CarouselColumn.builder()
+                                .thumbnailImageUrl(new URI(imageUrl))
+                                .title(title)
+                                .text(text)
+                                .actions(
+                                        List.of(
+                                                new PostbackAction("加入購物車", "action=add_to_cart&product_id="+ productId +"&product_name="+title),
+                                                new MessageAction("結帳", "結帳")
+                                        )
+                                )
+                                .build()
                 );
             } catch (Exception e) {
                 logger.info(e.getMessage());
@@ -246,10 +250,10 @@ public class LineBotServiceImpl implements LineBotService {
         });
 
         return new TemplateMessage(
-            "查詢商品",
-            CarouselTemplate.builder()
-                .columns(colList)
-                .build()
+                "查詢商品",
+                CarouselTemplate.builder()
+                        .columns(colList)
+                        .build()
         );
     }
     @Override

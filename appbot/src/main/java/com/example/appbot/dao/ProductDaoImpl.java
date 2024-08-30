@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Repository
-public class ProductDaoImpl implements ProductDao{
+public class ProductDaoImpl implements ProductDao {
 
     @Autowired
     private NamedParameterJdbcTemplate template;
@@ -34,6 +34,7 @@ public class ProductDaoImpl implements ProductDao{
 
         return template.query(sql, params, new ProductDTORowMapper());
     }
+
     @Override
     public List<ProductDTO> findProductById(Integer productId) {
         String sql = "SELECT * FROM products WHERE id =:productId";
@@ -42,6 +43,7 @@ public class ProductDaoImpl implements ProductDao{
 
         return template.query(sql, params, new ProductDTORowMapper());
     }
+
     @Override
     public List<ProductDTO> findProductByKeyword(String keyword) {
         String sql = "SELECT * FROM products WHERE name LIKE :keyword LIMIT 3";
@@ -52,10 +54,31 @@ public class ProductDaoImpl implements ProductDao{
     }
 
     @Override
-    public Integer findProductPrice(Integer productId){
+    public Integer findProductPrice(Integer productId) {
         String sql = "SELECT price FROM products WHERE id=:productId";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("productId", productId);
         return template.queryForObject(sql, params, Integer.class);
-    };
+    }
+
+    ;
+
+    @Override
+    public List<ProductDTO> findCampaign() {
+        String sql = "SELECT p.id, p.name, (p.price*c.discount_rate) AS price, p.image " +
+                "FROM products p " +
+                "JOIN campaigns c ON c.product_id = p.id " +
+                "WHERE c.create_at <= NOW() AND c.terminate_at >= NOW() " +
+                "ORDER BY c.create_at DESC " +
+                "LIMIT 3";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        return template.query(sql, params, (rs, rowNum) ->
+                ProductDTO.builder()
+                        .id(rs.getInt("id"))
+                        .name(rs.getString("name"))
+                        .price(rs.getInt("price"))
+                        .image(rs.getString("image"))
+                        .build()
+        );
+    }
 }
