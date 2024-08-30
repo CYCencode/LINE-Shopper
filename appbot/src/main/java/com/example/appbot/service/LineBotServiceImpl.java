@@ -44,6 +44,8 @@ public class LineBotServiceImpl implements LineBotService {
     private String CHANNEL_ACCESS_TOKEN;
     @Value("${web.page.checkout}")
     private String WEB_PAGE_CHECKOUT;
+    @Value("${web.page.cart}")
+    private String WEB_PAGE_CART;
 
     private static final Logger logger = LoggerFactory.getLogger(LineBotServiceImpl.class);
     private final ProductDao productDao;
@@ -147,7 +149,7 @@ public class LineBotServiceImpl implements LineBotService {
     }
     @Override
     public Message createCartButtonTemplate(String userId) {
-        String cartUrl = String.format("%s?line_user_id=%s", WEB_PAGE_CHECKOUT, userId);
+        String cartUrl = String.format("%s?line_user_id=%s", WEB_PAGE_CART, userId);
         URIAction cartAction = new URIAction("查看購物車", URI.create(cartUrl), new URIAction.AltUri(URI.create(cartUrl)));
 
         ButtonsTemplate buttonsTemplate = new ButtonsTemplate(
