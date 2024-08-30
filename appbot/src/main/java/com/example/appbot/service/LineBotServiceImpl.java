@@ -85,7 +85,7 @@ public class LineBotServiceImpl implements LineBotService {
                     throw new RuntimeException("購物車為空");
                 }
 
-                String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=1", WEB_PAGE_CHECKOUT,userId);
+                String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s", WEB_PAGE_CHECKOUT,userId, orderId);
                 return TextMessage.builder()
                     .text("是否進行結帳")
                     .quickReply(

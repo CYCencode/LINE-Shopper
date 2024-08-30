@@ -25,6 +25,7 @@ public class SecurityConfig {
             .authorizeHttpRequests((request) -> {
                     request
                         .requestMatchers("/callback").permitAll()
+                        .requestMatchers("/config/config.js").permitAll()
                         .requestMatchers("/checkout.html").permitAll()
                         .requestMatchers("/api/v1/order/checkout").permitAll()
                         .anyRequest().authenticated();
