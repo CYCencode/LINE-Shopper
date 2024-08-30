@@ -24,6 +24,7 @@ public class SecurityConfig {
             .csrf((csrf) -> csrf.disable())
             .authorizeHttpRequests((request) -> {
                     request
+                        .requestMatchers("/callback").permitAll()
                         .requestMatchers("/checkout.html").permitAll()
                         .requestMatchers("/api/v1/order/checkout").permitAll()
                         .anyRequest().authenticated();
