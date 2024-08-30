@@ -180,7 +180,7 @@ public class CheckoutServiceImpl implements CheckoutService{
         Integer statusCode = Integer.parseInt(resultArray[0]);
         if (!statusCode.equals(1)) {
             log.error(String.format("%s %s", orderDTO.getOrderNo(), resultArray[1]));
-            throw new CheckoutException("物流交易失敗");
+            throw new CheckoutException(String.format("物流交易失敗，%s",resultArray[1]));
         }
         Map<String, String> paramMap = PostbackDataParser.parse(resultArray[1]);
         logisticDao.createLogistic(

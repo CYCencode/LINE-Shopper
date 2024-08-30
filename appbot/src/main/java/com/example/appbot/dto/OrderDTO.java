@@ -15,6 +15,7 @@ public class OrderDTO {
     private Integer id;
     private String orderNo;
     private String lineUserId;
+    private String lineUsername;
     private Integer orderStatus;
     private Integer total;
     private ZonedDateTime createAt;

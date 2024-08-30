@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>訂單明細</title>
+    <link rel="stylesheet" href="order.css">
+    <script src="orderDetail.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul id="menu">
+               <li><a class="menuLink" href="/admin/order.html">訂單管理</a></li>
+               <li><a class="menuLink" href="/admin/campaign.html">活動管理</a></li>
+            </ul>
+            <button id="logoutBtn" class="red-btn">登出</button>
+        </nav>
+    </header>
+    <main>
+        <div class="mainContainer">
+            <table>
+                <thead>
+                <tr>
+                    <th>商品名稱</th>
+                    <th>商品數量</th>
+                    <th>商品價格</th>
+                    <th>商品特價</th>
+                </tr>
+                </thead>
+                <tbody id="orderDetailTable">
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

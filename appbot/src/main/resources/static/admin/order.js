@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
             for(let i=0;i<data.length;i++) {
                 let tr = `
                 <tr>
-                    <td>${data[i].orderNo == null ? "-" : data[i].orderNo}</td>
+                    <td><a href="/admin/orderDetail.html?order_id=${data[i].id}">${data[i].orderNo == null ? "-" : data[i].orderNo}</a></td>
                     <td>${data[i].total}</td>
                     <td>${orderStatus[data[i].orderStatus]}</td>
                     <td>${formatDatetime(data[i].createAt)}</td>

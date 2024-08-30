@@ -24,6 +24,7 @@ public class OrderDTORowMapper implements RowMapper<OrderDTO> {
         return OrderDTO.builder()
             .id(rs.getInt("id"))
             .orderNo(rs.getString("order_no"))
+            .lineUsername(rs.getString("line_user_name"))
             .lineUserId(rs.getString("line_user_id"))
             .orderStatus(rs.getInt("order_status"))
             .total(rs.getInt("total"))

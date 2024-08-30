@@ -37,6 +37,7 @@ public class CheckoutController {
                 map.put("msg", "購物車為空");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             map.put("success", false);
             map.put("msg", e.getMessage());
         }
