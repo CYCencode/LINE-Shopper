@@ -49,8 +49,6 @@ public class LineBotMessageHandler {
         }
         return null;
     }
-
-
 }
 
 

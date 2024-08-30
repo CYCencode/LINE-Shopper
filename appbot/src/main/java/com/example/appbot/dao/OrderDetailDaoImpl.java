@@ -91,4 +91,35 @@ public class OrderDetailDaoImpl implements OrderDetailDao {
                         .build()
         );
     }
+
+    @Override
+    public List<OrderDetailDTO> findOrderDetailListByOrderId(Integer orderId) {
+        String sql = "SELECT od.id, od.product_id, od.order_id, od.campaign_id, od.quantity, p.name AS productName, " +
+            "p.price AS originalPrice, " +
+            "CASE WHEN od.campaign_id IS NOT NULL THEN p.price * c.discount_rate ELSE p.price END AS discountedPrice " +
+            "FROM order_details od " +
+            "JOIN products p ON od.product_id = p.id " +
+            "LEFT JOIN campaigns c ON od.campaign_id = c.id " +
+            "WHERE od.order_id = :cartId";
+
+        MapSqlParameterSource params = new MapSqlParameterSource("cartId", orderId);
+
+        try {
+            return template.query(sql, params, (rs, rowNum) ->
+                OrderDetailDTO.builder()
+                    .id(rs.getInt("id"))
+                    .orderId(rs.getInt("order_id"))
+                    .campaignId(rs.getInt("campaign_id"))
+                    .productId(rs.getInt("product_id"))
+                    .productName(rs.getString("productName"))
+                    .quantity(rs.getInt("quantity"))
+                    .originalPrice(rs.getInt("originalPrice")) // 自動取整
+                    .discountedPrice(rs.getInt("discountedPrice"))
+                    .build()
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
 }
