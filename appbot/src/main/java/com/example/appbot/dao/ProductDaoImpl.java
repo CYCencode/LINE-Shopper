@@ -34,7 +34,14 @@ public class ProductDaoImpl implements ProductDao{
 
         return template.query(sql, params, new ProductDTORowMapper());
     }
+    @Override
+    public List<ProductDTO> findProductById(Integer productId) {
+        String sql = "SELECT * FROM products WHERE id =:productId";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("productId", productId);
 
+        return template.query(sql, params, new ProductDTORowMapper());
+    }
     @Override
     public List<ProductDTO> findProductByKeyword(String keyword) {
         String sql = "SELECT * FROM products WHERE name LIKE :keyword LIMIT 3";

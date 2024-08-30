@@ -9,4 +9,5 @@ public interface ProductDao {
     List<ProductDTO> findProductByCategory(Integer limit, String category);
     List<ProductDTO> findProductByKeyword(String keyword);
     Integer findProductPrice(Integer productId);
+    List<ProductDTO> findProductById(Integer productId);
 }
