@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>訂單查詢系統</title>
+    <link rel="stylesheet" href="order.css">
+    <script src="order.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul id="menu">
+               <li><a class="menuLink" href="/admin/main.html">主頁面</a></li>
+               <li><a class="menuLink" href="/admin/order.html">訂單管理</a></li>
+               <li><a class="menuLink" href="/admin/campaign.html">活動管理</a></li>
+            </ul>
+            <button id="logoutBtn" class="red-btn">登出</button>
+        </nav>
+    </header>
+    <main>
+        <div class="mainContainer">
+            <br>
+            <div style="display: inline-block;">
+                <input id="searchInput" type="text" placeholder="搜尋訂單流水號">
+                <button id="searchBtn" class="blue-btn" type="button">搜尋</button>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>訂單流水號</th>
+                    <th>訂單總金額</th>
+                    <th>訂單付款狀態</th>
+                    <th>訂單建立時間</th>
+                    <th>訂單修改時間</th>
+                </tr>
+                </thead>
+                <tbody id="orderTable">
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

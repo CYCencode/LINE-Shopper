@@ -14,4 +14,6 @@ public interface OrderDao {
     String getTodaySerialNumber();
     OrderDTO findOrderById(Integer id);
     Integer updateOrderNoById(Integer id, String orderNo);
+
+    List<OrderDTO> findOrder(String orderNo, Integer page);
 }

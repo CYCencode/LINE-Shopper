@@ -4,6 +4,7 @@ import com.example.appbot.dao.OrderDao;
 import com.example.appbot.dao.OrderDaoImpl;
 import com.example.appbot.dao.OrderDetailDao;
 import com.example.appbot.dto.OrderDetailDTO;
+import com.example.appbot.dto.OrderDTO;
 import com.example.appbot.enums.LimitAmount;
 import com.example.appbot.enums.StatusCode;
 import org.slf4j.Logger;
@@ -25,6 +26,12 @@ public class OrderServiceImpl implements OrderService {
         this.orderDetailDao = orderDetailDao;
         this.lineBotService = lineBotService;
     }
+
+    @Override
+    public List<OrderDTO> findOrder(String orderNo, Integer page) {
+        return orderDao.findOrder(orderNo, page);
+    }
+
     @Override
     public void addToCart(String userId, String productId) {
         Integer cartId = orderDao.findCartByUserId(userId);
