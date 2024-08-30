@@ -27,7 +27,8 @@ public class SecurityConfig {
                         .requestMatchers("/callback").permitAll()
                         .requestMatchers("/config/config.js").permitAll()
                         .requestMatchers("/checkout.html").permitAll()
-                        .requestMatchers("/api/v1/order/checkout").permitAll()
+                        .requestMatchers("/cart.html").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
                         .anyRequest().authenticated();
                 }
             )

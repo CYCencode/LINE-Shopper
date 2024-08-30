@@ -1,7 +1,6 @@
 package com.example.appbot.service;
 
 import com.example.appbot.dao.OrderDao;
-import com.example.appbot.dao.OrderDaoImpl;
 import com.example.appbot.dao.OrderDetailDao;
 import com.example.appbot.dto.OrderDetailDTO;
 import com.example.appbot.dto.OrderDTO;
@@ -33,6 +32,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Integer findCartByUserId(String lineUserId) {
+        return orderDao.findCartByUserId(lineUserId);
+    }
+
+    @Override
+    public Integer findOrderByUserId(String lineUserId) {
+        return orderDao.findOrderByUserId(lineUserId);
+    }
+
+    @Override
     public void addToCart(String userId, String productId) {
         Integer cartId = orderDao.findCartByUserId(userId);
         String userName = lineBotService.getUserProfile(userId);
@@ -47,5 +56,10 @@ public class OrderServiceImpl implements OrderService {
         }
         List<OrderDetailDTO> orderDetails = orderDao.updateOrderTotal(cartId);
         logger.info("Updated order details for cartId {}: {}", cartId, orderDetails);
+    }
+
+    @Override
+    public List<OrderDetailDTO> findOrderDetailListByOrderId(Integer orderId) {
+        return orderDetailDao.findOrderDetailListByOrderId(orderId);
     }
 }

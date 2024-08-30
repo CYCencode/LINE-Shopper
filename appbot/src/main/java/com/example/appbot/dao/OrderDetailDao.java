@@ -9,4 +9,5 @@ public interface OrderDetailDao {
     Integer incQtyOrderDetailByOrderId(Integer cartId, Integer productId);
     Integer addOrderDetail(Integer cartId, Integer productId, Integer quantity);
     List<OrderDetailDTO> calcCartTotal(Integer cartId);
+    List<OrderDetailDTO> findOrderDetailListByOrderId(Integer orderId);
 }
