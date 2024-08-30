@@ -26,7 +26,8 @@ public class TappayResultDTO {
     //    private String cardSecret;
     private Integer amount;
     private String currency;
-    //    private String cardInfo;
+    @JsonProperty("card_info")
+    private CardInfoDTO cardInfo;
     @JsonProperty("order_number")
     private String orderNumber;
     private String acquirer;
