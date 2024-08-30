@@ -1,7 +1,11 @@
 package com.example.appbot.service;
 
+import com.example.appbot.dao.LogisticDao;
 import com.example.appbot.dao.OrderDao;
+import com.example.appbot.dao.OrderDetailDao;
 import com.example.appbot.dao.ProductDao;
+import com.example.appbot.dto.LogisticDTO;
+import com.example.appbot.dto.OrderDetailDTO;
 import com.example.appbot.dto.ProductDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.linecorp.bot.client.LineMessagingClient;
@@ -51,13 +55,17 @@ public class LineBotServiceImpl implements LineBotService {
     private final ProductDao productDao;
     private final S3Service s3Service;
     private final OrderDao orderDao;
+    private final OrderDetailDao orderDetailDao;
+    private final LogisticDao logisticDao;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final LineMessagingClient lineMessagingClient;
-    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service, OrderDao orderDao, RestTemplate restTemplate, ObjectMapper objectMapper, LineMessagingClient lineMessagingClient) {
+    public LineBotServiceImpl(ProductDao productDao, S3Service s3Service, OrderDao orderDao, OrderDetailDao orderDetailDao, LogisticDao logisticDao, RestTemplate restTemplate, ObjectMapper objectMapper, LineMessagingClient lineMessagingClient) {
         this.productDao = productDao;
         this.s3Service = s3Service;
         this.orderDao = orderDao;
+        this.orderDetailDao = orderDetailDao;
+        this.logisticDao = logisticDao;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.lineMessagingClient = lineMessagingClient;
@@ -78,7 +86,11 @@ public class LineBotServiceImpl implements LineBotService {
             return createCarouselMessage(dtoList);
         } else if ("查看購物車".equals(userMessage)) {
             return createCartQuickReplyMessage(userId, " 點擊按鈕查看您的購物車");
-        } else if ("結帳".equals(userMessage)) {
+        }else if (userMessage.startsWith("STC") && userMessage.length() == 16) {
+            String orderNo = userMessage;
+            return createSearchOrderTextMessage(orderNo);
+        }
+        else if ("結帳".equals(userMessage)) {
             try {
                 Integer orderId = orderDao.findCartByUserId(userId);
                 if (orderId == null) {
@@ -107,6 +119,38 @@ public class LineBotServiceImpl implements LineBotService {
 
         } else{
             return createTextMessage("請輸入 : 想了解，查看可以搜尋的類別");
+        }
+    }
+    public Message createSearchOrderTextMessage(String orderNo) {
+        try{
+            // 先取得對應的 order_id
+            Integer orderId = orderDao.findOrderIdByOrderNo(orderNo);
+            if (orderId == null) {
+                return createTextMessage("找不到訂單編號為 " + orderNo + " 的訂單。");
+            }
+
+            // 獲取訂單明細並計算總消費金額
+            List<OrderDetailDTO> orderDetails = orderDetailDao.findOrderDetailListByOrderId(orderId);
+            Integer totalAmount = orderDetails.stream()
+                    .mapToInt(detail -> detail.getDiscountedPrice() * detail.getQuantity())
+                    .sum();
+
+            // 構建購買清單 :
+            StringBuilder purchasedItems = new StringBuilder();
+            for (OrderDetailDTO detail : orderDetails) {
+                purchasedItems.append(detail.getProductName()).append("\n");
+            }
+            logger.info(String.valueOf(purchasedItems));
+            // 獲取物流資訊
+            LogisticDTO logistic = logisticDao.searchLogisticByOrderNo(orderNo);
+
+            // 構建回傳訊息
+            String responseMessage = String.format("訂單編號: %s\n總消費金額: %d\n購買清單:\n%s商品狀態: %s",
+                    orderNo, totalAmount, purchasedItems, logistic.getStatus());
+
+            return new TextMessage(responseMessage);
+        } catch (Exception e){
+            return createTextMessage("請輸入有效的訂單編號。");
         }
     }
 

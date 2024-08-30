@@ -187,7 +187,7 @@ public class CheckoutServiceImpl implements CheckoutService{
             LogisticDTO.builder()
                 .orderId(orderDTO.getId())
                 .orderNo(paramMap.get("MerchantTradeNo"))
-                .status(paramMap.get("RtoCode"))
+                .status(paramMap.get("RtnCode"))
                 .shipping(paramMap.get("LogisticsType"))
                 .allPayLogisticId(paramMap.get("AllPayLogisticsID"))
                 .bookingNote(paramMap.get("BookingNote"))
