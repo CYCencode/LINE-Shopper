@@ -145,7 +145,7 @@ public class LineBotServiceImpl implements LineBotService {
             LogisticDTO logistic = logisticDao.searchLogisticByOrderNo(orderNo);
 
             // 構建回傳訊息
-            String responseMessage = String.format("訂單編號: %s\n總消費金額: %d\n購買清單:\n%s商品狀態: %s",
+            String responseMessage = String.format("訂單編號: %s\n總消費金額: %d\n購買清單:\n%s訂單狀態: %s",
                     orderNo, totalAmount, purchasedItems, logistic.getStatus());
 
             return new TextMessage(responseMessage);
