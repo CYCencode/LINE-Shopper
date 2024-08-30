@@ -9,7 +9,6 @@ import java.util.List;
 public interface OrderDao {
     Integer createOrder(String lineUserId,String lineUserName,Integer orderStatus);
     Integer findCartByUserId(String lineUserId);
-    Integer findOrderByUserId(String lineUserId);
     List<OrderDetailDTO> updateOrderTotal(Integer cartId);
     Integer updateOrderStatus(Integer cartId,Integer orderStatus);
     String getTodaySerialNumber();

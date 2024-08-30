@@ -8,7 +8,6 @@ import java.util.List;
 public interface OrderService {
     List<OrderDTO> findOrder(String orderNo, Integer page);
     Integer findCartByUserId(String lineUserId);
-    Integer findOrderByUserId(String lineUserId);
     void addToCart(String userId, String productId);
     List<OrderDetailDTO> findOrderDetailListByOrderId(Integer orderId);
 }

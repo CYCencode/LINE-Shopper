@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>${data[i].quantity}</td>
                 <td>${data[i].originalPrice}</td>
                 <td>${data[i].discountedPrice}</td>
+                <td>${data[i].discountedPrice * data[i].quantity}</td>
             </tr>
             `
             orderDetailTable.innerHTML += tr

@@ -51,19 +51,6 @@ public class OrderDaoImpl implements OrderDao{
     }
 
     @Override
-    public Integer findOrderByUserId(String lineUserId) {
-        String sql ="SELECT id FROM orders WHERE line_user_id = :user_id";
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("user_id", lineUserId)
-            .addValue("order_status", StatusCode.ORDER_STATUS_CART.ordinal());
-        try {
-            return template.queryForObject(sql, params, Integer.class);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-
-    @Override
     public Integer createOrder(String lineUserId, String lineUserName, Integer orderStatus){
         ZonedDateTime currentTime = ZonedDateTime.now(getTimeZone());
         String order_no = getTodaySerialNumber();

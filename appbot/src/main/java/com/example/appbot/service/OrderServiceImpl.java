@@ -39,11 +39,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Integer findOrderByUserId(String lineUserId) {
-        return orderDao.findOrderByUserId(lineUserId);
-    }
-
-    @Override
     public void addToCart(String userId, String productId) {
         Integer cartId = orderDao.findCartByUserId(userId);
         String userName = lineBotService.getUserProfile(userId);
