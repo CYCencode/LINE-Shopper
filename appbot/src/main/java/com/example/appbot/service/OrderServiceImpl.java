@@ -2,9 +2,12 @@ package com.example.appbot.service;
 
 import com.example.appbot.dao.OrderDao;
 import com.example.appbot.dao.OrderDetailDao;
+import com.example.appbot.dto.OrderDTO;
 import com.example.appbot.enums.LimitAmount;
 import com.example.appbot.enums.StatusCode;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -15,6 +18,12 @@ public class OrderServiceImpl implements OrderService {
         this.orderDao = orderDao;
         this.orderDetailDao = orderDetailDao;
     }
+
+    @Override
+    public List<OrderDTO> findOrder(String orderNo, Integer page) {
+        return orderDao.findOrder(orderNo, page);
+    }
+
     @Override
     public void addToCart(String userId, String productId) {
         Integer cartId = orderDao.findCartByUserId(userId);

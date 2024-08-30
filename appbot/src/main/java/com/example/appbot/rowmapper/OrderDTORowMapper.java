@@ -23,7 +23,7 @@ public class OrderDTORowMapper implements RowMapper<OrderDTO> {
         ZonedDateTime zLastModifyAt = lastModifyAt == null ? null : lastModifyAt.toInstant().atZone(zoneId);
         return OrderDTO.builder()
             .id(rs.getInt("id"))
-//            .orderNo(rs.getString("order_no"))
+            .orderNo(rs.getString("order_no"))
             .lineUserId(rs.getString("line_user_id"))
             .orderStatus(rs.getInt("order_status"))
             .total(rs.getInt("total"))

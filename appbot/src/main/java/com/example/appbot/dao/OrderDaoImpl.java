@@ -5,6 +5,7 @@ import com.example.appbot.enums.StatusCode;
 import com.example.appbot.exception.CheckoutException;
 import com.example.appbot.rowmapper.OrderDTORowMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Repository
 public class OrderDaoImpl implements OrderDao{
@@ -133,6 +135,18 @@ public class OrderDaoImpl implements OrderDao{
             .addValue("order_no", orderNo);
 
         return template.update(sql, params);
+    }
+
+    @Override
+    public List<OrderDTO> findOrder(String orderNo, Integer page) {
+        StringBuilder sb = new StringBuilder("SELECT * FROM orders WHERE 1=1 ");
+        if(orderNo != null) {
+            sb.append("AND order_no LIKE :order_no ORDER BY order_no ");
+        }
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("order_no", "%" +orderNo+"%");
+
+        return template.query(sb.toString(), params, new OrderDTORowMapper());
     }
 }
 
