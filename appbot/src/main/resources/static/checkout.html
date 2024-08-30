@@ -5,6 +5,7 @@
     <title>結帳</title>
     <title>Check Out</title>
     <!-- Load TapPay SDK -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script>
     <script src="config/config.js"></script>
     <script>
@@ -68,8 +69,12 @@
             };
         }
         function onSubmit(){
+            const checkoutBtn = document.querySelector("#checkoutBtn")
+            checkoutBtn.disabled=true
+        
             // check if from is valid
             if(!validateForm()){
+                checkoutBtn.disabled=false
                 return; //stop submit
             }
             // get params from URL
@@ -81,6 +86,7 @@
             TPDirect.card.getPrime(function(result){
                 if (result.status !== 0){
                     alert('取得 prime 失敗 : ' + result.msg);
+                    checkoutBtn.disabled=false
                     return;
                 }
                 // get prime
@@ -113,6 +119,7 @@
                 })
                     .then(response=> response.json())
                     .then(data => {
+                        checkoutBtn.disabled=false
                         if(data.success){
                             customAlert(data.msg, function(){
                                 window.location.href=confirm_redirect_url;
@@ -123,6 +130,7 @@
                         }
                     })
                     .catch(error=>{
+                        checkoutBtn.disabled=false
                         console.error("Error: ", error);
                         alert("提交訂單時發生錯誤！請稍後再試");
                     });
@@ -192,52 +200,97 @@
     </script>
     <style>
         .tpfield {
-            height: 40px;
-            width: 300px;
-            border: 1px solid gray;
-            margin: 5px 0;
-            padding: 5px;
+             height: 40px;
+             width: 100%; /* 調整寬度以符合手機螢幕 */
+             border: 1px solid gray;
+             margin: 5px 0;
+             padding: 5px;
+             box-sizing: border-box; /* 確保 padding 不會超出容器 */
         }
+
         .error-message {
-            color: red;
-            font-size: 0.8em;
-            margin-top: 5px;
+             color: red;
+             font-size: 0.8em;
+             margin-top: 5px;
         }
+
         input.error {
             border: 1px solid red;
         }
+
         #customAlert {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             background-color: rgba(0, 0, 0, 0.5);
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             z-index: 1000;
         }
 
         .alert-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
+             background-color: white;
+             padding: 20px;
+             border-radius: 5px;
+             text-align: center;
+             width: 90%; /* 調整寬度以符合手機螢幕 */
+             box-sizing: border-box; /* 確保 padding 不會超出容器 */
         }
 
         #alertConfirm {
-            margin-top: 10px;
-            padding: 5px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
+             margin-top: 10px;
+             padding: 10px; /* 增加 padding 以便更容易在手機上點擊 */
+             background-color: #4CAF50;
+             color: white;
+             border: none;
+             border-radius: 3px;
+             cursor: pointer;
+             width: 100%; /* 調整寬度以符合手機螢幕 */
         }
 
         #alertConfirm:hover {
-            background-color: #45a049;
+             background-color: #45a049;
+        }
+
+        label {
+             display: inline-block;
+             margin-bottom: 5px;
+             font-size: 1em;
+        }
+
+        input[type="text"], input[type="email"], .tpfield {
+             width: 100%; /* 調整寬度以符合手機螢幕 */
+             padding: 10px; /* 增加 padding 以便更容易在手機上輸入 */
+             box-sizing: border-box; /* 確保 padding 不會超出容器 */
+        }
+
+        .blue-btn {
+            width: 100%;
+            margin: 1rem 0;
+            padding: 8px 16px;
+            background-color: #4f99d9;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        @media only screen and (max-width: 600px) {
+             .alert-content {
+                 width: 90%; /* 調整寬度以符合手機螢幕 */
+             }
+
+             .tpfield {
+                 width: 100%; /* 調整寬度以符合手機螢幕 */
+             }
+
+             input[type="text"], input[type="email"], #alertConfirm {
+                 width: 100%; /* 調整寬度以符合手機螢幕 */
+             }
         }
     </style>
 </head>
@@ -270,7 +323,7 @@
     </div>
     <div>
         <label for="receiver_phone">收件人電話</label>
-        <input type="text" id="receiver_phone" name="receiver_phone" placeholder="請輸入收件人電話" required />
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="receiver_phone" name="receiver_phone" placeholder="請輸入收件人電話" required />
         <div id="receiver_phone_error" class="error-message"></div>
     </div>
     <div>
@@ -280,7 +333,7 @@
     </div>
     <div>
         <label for="receiver_zipcode">收件人郵遞區號</label>
-        <input type="text" id="receiver_zipcode" name="receiver_zipcode" placeholder="請輸入郵遞區號" required />
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="receiver_zipcode" name="receiver_zipcode" placeholder="請輸入郵遞區號" required />
         <div id="receiver_zipcode_error" class="error-message"></div>
     </div>
     <div>
@@ -289,6 +342,6 @@
         <div id="receiver_email_error" class="error-message"></div>
     </div>
 </div>
-<button onclick="onSubmit()">結帳</button>
+<button id="checkoutBtn" class="blue-btn" onclick="onSubmit()">結帳</button>
 </body>
 </html>
