@@ -11,10 +11,9 @@ import java.util.List;
 public interface LineBotService {
     Message handleTextMessage(MessageEvent<TextMessageContent> event);
     Message createProductButtonsTemplate(ProductDTO productDTO);
-    Message createCartButtonTemplate(String userId);
     Message createQuickReplyMessage();
+    Message createCartQuickReplyMessage(String userId, String text);
     Message createTextMessage(String text);
-    void pushTextMessage(String userId, String text);
     Message createCarouselMessage(List<ProductDTO> dtoList);
     String getUserProfile(String userId);
 }

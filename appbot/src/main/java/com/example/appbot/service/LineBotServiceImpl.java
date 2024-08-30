@@ -77,7 +77,7 @@ public class LineBotServiceImpl implements LineBotService {
             List<ProductDTO> dtoList = productDao.findProductByKeyword(userMessage);
             return createCarouselMessage(dtoList);
         } else if ("查看購物車".equals(userMessage)) {
-            return createCartButtonTemplate(userId);
+            return createCartQuickReplyMessage(userId, " 點擊按鈕查看您的購物車");
         } else if ("結帳".equals(userMessage)) {
             try {
                 Integer orderId = orderDao.findCartByUserId(userId);
@@ -148,31 +148,27 @@ public class LineBotServiceImpl implements LineBotService {
         }
     }
     @Override
-    public Message createCartButtonTemplate(String userId) {
+    public Message createCartQuickReplyMessage(String userId, String text) {
         String cartUrl = String.format("%s?line_user_id=%s", WEB_PAGE_CART, userId);
-        URIAction cartAction = new URIAction("查看購物車", URI.create(cartUrl), new URIAction.AltUri(URI.create(cartUrl)));
 
-        ButtonsTemplate buttonsTemplate = new ButtonsTemplate(
-                null,
-                "商品已加入購物車！",
-                "您可以查看您的購物車",
-                Arrays.asList(cartAction)
+        QuickReply quickReply = QuickReply.items(
+                Arrays.asList(
+                        QuickReplyItem.builder()
+                                .action(new URIAction("查看購物車", URI.create(cartUrl), new URIAction.AltUri(URI.create(cartUrl))))
+                                .build()
+                )
         );
 
-        return new TemplateMessage("查看購物車", buttonsTemplate);
+        return TextMessage.builder()
+                .text(text)
+                .quickReply(quickReply)
+                .build();
     }
 
     @Override
     public Message createTextMessage(String text) {
         return new TextMessage(text);
     }
-    @Override
-    public void pushTextMessage(String userId, String text) {
-        TextMessage textMessage = new TextMessage(text);
-        PushMessage pushMessage = new PushMessage(userId, textMessage);
-        lineMessagingClient.pushMessage(pushMessage);
-    }
-
 
     @Override
     public Message createCarouselMessage(List<ProductDTO> dtoList) {

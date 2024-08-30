@@ -43,13 +43,10 @@ public class LineBotMessageHandler {
 
         if ("add_to_cart".equals(actionValue)) {
             orderService.addToCart(userId, productId);
-            lineBotService.pushTextMessage(userId, productName + " 已加入購物車");
-            Message cartButtonMessage = lineBotService.createCartButtonTemplate(userId);
-            return cartButtonMessage;
+            return lineBotService.createCartQuickReplyMessage(userId, productName + " 已加入購物車");
         }
         return null;
     }
-
 
 }
 
