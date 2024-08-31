@@ -154,6 +154,13 @@ public class OrderDaoImpl implements OrderDao{
         params.addValue("order_no", orderNo);
         return template.queryForObject(sql, params, Integer.class);
     }
+    @Override
+    public Integer getTotalByOrderId(Integer orderId){
+        String sql = "SELECT total FROM orders WHERE id = :order_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("order_id", orderId);
+        return template.queryForObject(sql, params, Integer.class);
+    }
 }
 
 

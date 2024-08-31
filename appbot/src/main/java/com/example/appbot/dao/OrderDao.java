@@ -16,4 +16,5 @@ public interface OrderDao {
     Integer updateOrderNoById(Integer id, String orderNo);
     Integer findOrderIdByOrderNo(String orderNo);
     List<OrderDTO> findOrder(String orderNo, Integer page);
+    Integer getTotalByOrderId(Integer orderId);
 }

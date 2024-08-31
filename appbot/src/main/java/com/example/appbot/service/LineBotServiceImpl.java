@@ -97,11 +97,12 @@ public class LineBotServiceImpl implements LineBotService {
         else if ("結帳".equals(userMessage)) {
             try {
                 Integer orderId = orderDao.findCartByUserId(userId);
+                Integer total = orderDao.getTotalByOrderId(orderId);
                 if (orderId == null) {
                     throw new RuntimeException("購物車內無商品");
                 }
 
-                String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s", WEB_PAGE_CHECKOUT,userId, orderId);
+                String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s&total=%s", WEB_PAGE_CHECKOUT,userId, orderId, total);
                 return TextMessage.builder()
                         .text("是否進行結帳")
                         .quickReply(
