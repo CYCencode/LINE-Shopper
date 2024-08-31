@@ -17,4 +17,9 @@ public class LogisticDTO {
     private String shipping;
     private String allPayLogisticId;
     private String bookingNote;
+    private String receiverAddress;
+    private String receiverCellPhone;
+    private String receiverName;
+    private String receiverZipcode;
+    private String receiverEmail;
 }

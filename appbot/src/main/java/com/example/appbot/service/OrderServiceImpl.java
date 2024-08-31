@@ -1,9 +1,13 @@
 package com.example.appbot.service;
 
+import com.example.appbot.dao.LogisticDao;
 import com.example.appbot.dao.OrderDao;
 import com.example.appbot.dao.OrderDetailDao;
+import com.example.appbot.dao.PaymentDao;
+import com.example.appbot.dto.LogisticDTO;
 import com.example.appbot.dto.OrderDetailDTO;
 import com.example.appbot.dto.OrderDTO;
+import com.example.appbot.dto.PaymentDTO;
 import com.example.appbot.enums.LimitAmount;
 import com.example.appbot.enums.StatusCode;
 import org.slf4j.Logger;
@@ -15,14 +19,17 @@ import java.util.List;
 @Service
 public class OrderServiceImpl implements OrderService {
     private final OrderDao orderDao;
+    private final LogisticDao logisticDao;
+    private final PaymentDao paymentDao;
     private final OrderDetailDao orderDetailDao;
     private final LineBotService lineBotService;
     private final S3Service s3Service;
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-
-    public OrderServiceImpl(OrderDao orderDao, OrderDetailDao orderDetailDao, LineBotService lineBotService, S3Service s3Service) {
+    public OrderServiceImpl(OrderDao orderDao, LogisticDao logisticDao, PaymentDao paymentDao, OrderDetailDao orderDetailDao, LineBotService lineBotService, S3Service s3Service) {
         this.orderDao = orderDao;
+        this.logisticDao = logisticDao;
+        this.paymentDao = paymentDao;
         this.orderDetailDao = orderDetailDao;
         this.lineBotService = lineBotService;
         this.s3Service = s3Service;
@@ -61,5 +68,15 @@ public class OrderServiceImpl implements OrderService {
         // add s3 prefix
         orderDetailDTO.forEach(dto -> {dto.setProductImage(s3Service.getFileUrl(dto.getProductImage()));});
         return orderDetailDTO;
+    }
+
+    @Override
+    public LogisticDTO findLogisticByOrderId(Integer orderId) {
+        return logisticDao.findLogisticByOrderId(orderId);
+    }
+
+    @Override
+    public PaymentDTO findPaymentByOrderId(Integer orderId) {
+        return paymentDao.findPaymentByOrderId(orderId);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.appbot.dao;
 
+import com.example.appbot.dto.LogisticDTO;
 import com.example.appbot.dto.OrderDetailDTO;
+import com.example.appbot.dto.PaymentDTO;
 
 import java.util.List;
 

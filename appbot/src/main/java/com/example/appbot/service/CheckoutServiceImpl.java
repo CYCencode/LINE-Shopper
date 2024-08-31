@@ -192,6 +192,11 @@ public class CheckoutServiceImpl implements CheckoutService{
                 .shipping(paramMap.get("LogisticsType"))
                 .allPayLogisticId(paramMap.get("AllPayLogisticsID"))
                 .bookingNote(paramMap.get("BookingNote"))
+                .receiverAddress(crDTO.getReceiverAddress())
+                .receiverCellPhone(crDTO.getReceiverPhone())
+                .receiverName(crDTO.getReceiverName())
+                .receiverZipcode(crDTO.getReceiverZipcode())
+                .receiverEmail(crDTO.getReceiverEmail())
                 .build()
         );
 

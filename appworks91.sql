@@ -60,6 +60,11 @@ CREATE TABLE `logistics` (
   `shipping` varchar(32) DEFAULT NULL,
   `allpaylogistic_id` varchar(20) DEFAULT NULL,
   `booking_note` varchar(50) DEFAULT NULL,
+  `receiver_address` varchar(255) DEFAULT NULL,
+  `receiver_phone` varchar(32) DEFAULT NULL,
+  `receiver_name` varchar(255) DEFAULT NULL,
+  `receiver_zipcode` varchar(32) DEFAULT NULL,
+  `receiver_email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`),
   CONSTRAINT `logistics_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`)

@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1")
 @Log4j2
@@ -31,5 +34,19 @@ public class SearchController {
         return ResponseEntity.ok(
             orderService.findOrderDetailListByOrderId(orderId)
         );
+    }
+
+    @GetMapping("/orderPayment/search")
+    public ResponseEntity<?> searchOrderPayment(@RequestParam("order_id") Integer orderId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", orderService.findPaymentByOrderId(orderId));
+        return ResponseEntity.ok(map);
+    }
+
+    @GetMapping("/orderLogistic/search")
+    public ResponseEntity<?> searchOrderLogistic(@RequestParam("order_id") Integer orderId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", orderService.findLogisticByOrderId(orderId));
+        return ResponseEntity.ok(map);
     }
 }

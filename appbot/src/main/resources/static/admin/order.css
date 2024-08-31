@@ -10,6 +10,8 @@ table {
     margin: 20px 0;
     font-size: 16px;
     text-align: left;
+    table-layout:fixed;
+    word-break:break-all;;
 }
 
 th, td {
@@ -84,8 +86,9 @@ nav {
 }
 
 .mainContainer {
-    display: flex;
-    width: 100%;
+    display: flexbox;
+    width: 90%;
+    margin: auto;
     flex-direction: column;
     justify-content: center;
 }

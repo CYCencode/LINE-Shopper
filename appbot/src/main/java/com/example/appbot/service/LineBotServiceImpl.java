@@ -98,7 +98,7 @@ public class LineBotServiceImpl implements LineBotService {
             try {
                 Integer orderId = orderDao.findCartByUserId(userId);
                 if (orderId == null) {
-                    throw new RuntimeException("購物車為空");
+                    throw new RuntimeException("購物車內無商品");
                 }
 
                 String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s", WEB_PAGE_CHECKOUT,userId, orderId);

@@ -1,7 +1,11 @@
 package com.example.appbot.dao;
 
+import com.example.appbot.dto.PaymentDTO;
 import com.example.appbot.dto.TappayResultDTO;
+import com.example.appbot.rowmapper.LogisticDTORowMapper;
+import com.example.appbot.rowmapper.PaymentDTORowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -51,6 +55,19 @@ public class PaymentDaoImpl implements PaymentDao{
             return keyHolder.getKey().intValue();
         } else {
             throw new RuntimeException("payment");
+        }
+    }
+
+    @Override
+    public PaymentDTO findPaymentByOrderId(Integer orderId) {
+        String sql = "SELECT * FROM payments WHERE order_id = :order_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("order_id", orderId);
+
+        try {
+            return template.queryForObject(sql, params, new PaymentDTORowMapper());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
 }
