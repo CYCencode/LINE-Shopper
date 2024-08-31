@@ -12,4 +12,5 @@ public interface ProductDao {
     Integer findProductPrice(Integer productId);
     List<ProductDTO> findProductById(Integer productId);
     List<ProductDTO> findCampaign();
+    Integer createProduct(ProductDTO productDTO);
 }

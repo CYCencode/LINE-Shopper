@@ -22,20 +22,19 @@ public class S3Service {
         this.s3Client = s3Client;
     }
 
-    public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = file.getOriginalFilename();
+    public String uploadFile(MultipartFile file, String uuidFileName) throws IOException {
         Map<String, String> metadata = new HashMap<>();
         metadata.put("Content-Type", file.getContentType());
 
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fileName)
+                .key(uuidFileName)
                 .metadata(metadata)
                 .contentType(file.getContentType())
                 .build();
 
         S3Response response = s3Client.putObject(putObjectRequest, software.amazon.awssdk.core.sync.RequestBody.fromBytes(file.getBytes()));
-        return fileName;
+        return uuidFileName;
     }
 
     public String getFileUrl(String fileName) {
