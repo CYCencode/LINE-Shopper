@@ -148,10 +148,21 @@ public class LineBotServiceImpl implements LineBotService {
             logger.info(String.valueOf(purchasedItems));
             // 獲取物流資訊
             LogisticDTO logistic = logisticDao.searchLogisticByOrderNo(orderNo);
-
+            String status = logistic.getStatus();
+            if (status.equals("300")) {
+                status = "物流已收單";
+            }else if (status.equals("3003")) {
+                status = "配送完畢";
+            } else if (status.equals("3001")) {
+                status = "轉運中";
+            } else if (status.equals("3006")) {
+                status = "配送中";
+            }else{
+                status = "物流準備中";
+            }
             // 構建回傳訊息
             String responseMessage = String.format("訂單編號: %s\n總消費金額: %d\n購買清單:\n%s訂單狀態: %s",
-                    orderNo, totalAmount, purchasedItems, logistic.getStatus());
+                    orderNo, totalAmount, purchasedItems, status);
 
             return new TextMessage(responseMessage);
         } catch (Exception e){
