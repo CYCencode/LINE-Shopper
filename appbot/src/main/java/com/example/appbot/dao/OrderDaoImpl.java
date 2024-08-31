@@ -28,7 +28,6 @@ public class OrderDaoImpl implements OrderDao{
     private final NamedParameterJdbcTemplate template;
     private final ProductDao productDao;
     private final OrderDetailDao orderDetailDao;
-    private static final Logger logger = LoggerFactory.getLogger(OrderDaoImpl.class);
     public OrderDaoImpl(NamedParameterJdbcTemplate template, ProductDao productDao, OrderDetailDao orderDetailDao) {
         this.template = template;
         this.productDao = productDao;
@@ -75,7 +74,6 @@ public class OrderDaoImpl implements OrderDao{
         Integer total = orderDetails.stream()
                 .mapToInt(detail -> detail.getDiscountedPrice() * detail.getQuantity())
                 .sum();
-        logger.info(String.format("Total : %d", total));
         String sql = "UPDATE orders SET total = :total WHERE id = :id";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", cartId);

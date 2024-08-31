@@ -1,8 +1,11 @@
 package com.example.appbot.controller;
 
 import com.example.appbot.dao.OrderDao;
+import com.example.appbot.dao.OrderDaoImpl;
 import com.example.appbot.dto.CheckoutRequestDTO;
 import com.example.appbot.service.CheckoutService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +20,8 @@ public class CheckoutController {
 
     private final OrderDao orderDao;
     private final CheckoutService checkoutService;
+    private static final Logger logger = LoggerFactory.getLogger(CheckoutController.class);
+
 
     public CheckoutController(OrderDao orderDao, CheckoutService checkoutService) {
         this.orderDao = orderDao;
@@ -39,7 +44,8 @@ public class CheckoutController {
         } catch (Exception e) {
             e.printStackTrace();
             map.put("success", false);
-            map.put("msg", e.getMessage());
+            map.put("msg", "購物車系統忙碌中，請稍後再試");
+            logger.error(e.getMessage());
         }
         return ResponseEntity.ok(map);
     }
