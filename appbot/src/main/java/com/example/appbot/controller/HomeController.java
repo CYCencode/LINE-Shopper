@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
     @GetMapping("/")
-    public ResponseEntity<?> home(HttpServletRequest request) {
+    public ResponseEntity<?> home() {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/admin/order.html");
         return new ResponseEntity<>(headers, HttpStatus.FOUND);

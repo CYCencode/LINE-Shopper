@@ -102,8 +102,12 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then(r => r.json())
         .then(data => {
-            alert(`已新增促銷活動ID:${data.data}`)
-            search()
+            if (data.data) {
+                alert(`已新增促銷活動ID:${data.data}`)
+                search()
+            } else {
+                alert(`${data.msg}`)
+            }             
         })
     })
 
