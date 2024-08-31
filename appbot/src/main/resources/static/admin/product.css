@@ -163,6 +163,13 @@ nav {
     background-color: #007B9A;
 }
 
+.searchInput {
+    padding: 8px 16px;
+    border: 1px solid lightgray;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
 @media (max-width: 600px) {
     .add-product-btn,
     .submit-btn {

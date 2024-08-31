@@ -16,23 +16,23 @@ function addProductForm() {
         <div class="product-form" id="product-form-${productIndex}">
             <div class="form-group">
                 <label for="name-${productIndex}">商品名稱</label>
-                <input type="text" id="name-${productIndex}" name="name-${productIndex}" required>
+                <input type="text" id="name-${productIndex}" class="searchInput" name="name-${productIndex}" required>
             </div>
             <div class="form-group">
                 <label for="price-${productIndex}">價格</label>
-                <input type="number" id="price-${productIndex}" name="price-${productIndex}" step="0.01" required>
+                <input type="number" id="price-${productIndex}" class="searchInput" name="price-${productIndex}" step="0.01" required>
             </div>
             <div class="form-group">
                 <label for="stock-${productIndex}">庫存</label>
-                <input type="number" id="stock-${productIndex}" name="stock-${productIndex}" required>
+                <input type="number" id="stock-${productIndex}" class="searchInput" name="stock-${productIndex}" required>
             </div>
             <div class="form-group">
                 <label for="category-${productIndex}">類別</label>
-                <input type="text" id="category-${productIndex}" name="category-${productIndex}" required>
+                <input type="text" id="category-${productIndex}" class="searchInput" name="category-${productIndex}" required>
             </div>
             <div class="form-group">
                 <label for="image-${productIndex}">商品圖片</label>
-                <input type="file" id="image-${productIndex}" name="image-${productIndex}" accept="image/*" required>
+                <input type="file" id="image-${productIndex}" class="searchInput" name="image-${productIndex}" accept="image/*" required>
             </div>
         </div>
     `;
