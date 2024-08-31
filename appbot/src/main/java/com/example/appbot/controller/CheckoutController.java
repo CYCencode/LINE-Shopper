@@ -3,6 +3,7 @@ package com.example.appbot.controller;
 import com.example.appbot.dao.OrderDao;
 import com.example.appbot.dao.OrderDaoImpl;
 import com.example.appbot.dto.CheckoutRequestDTO;
+import com.example.appbot.exception.CheckoutException;
 import com.example.appbot.service.CheckoutService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,11 @@ public class CheckoutController {
                 map.put("success", false);
                 map.put("msg", "購物車內無商品");
             }
-        } catch (Exception e) {
+        } catch (CheckoutException e) {
+            map.put("success", false);
+            map.put("msg", e.getMessage());
+        }
+        catch (Exception e) {
             e.printStackTrace();
             map.put("success", false);
             map.put("msg", "購物車系統忙碌中，請稍後再試");
