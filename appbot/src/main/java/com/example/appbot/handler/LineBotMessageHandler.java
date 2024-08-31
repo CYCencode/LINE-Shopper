@@ -3,6 +3,7 @@ package com.example.appbot.handler;
 import com.example.appbot.service.LineBotService;
 import com.example.appbot.service.OrderService;
 import com.example.appbot.util.PostbackDataParser;
+import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
@@ -46,6 +47,11 @@ public class LineBotMessageHandler {
             return lineBotService.createCartQuickReplyMessage(userId, productName + " 已加入購物車");
         }
         return null;
+    }
+    @EventMapping
+    public Message handleDefaultMessageEvent(Event event) {
+        logger.info("Received non-text message event: {}", event);
+        return lineBotService.createTextMessage("目前僅支援文字對話功能呦～");
     }
 }
 

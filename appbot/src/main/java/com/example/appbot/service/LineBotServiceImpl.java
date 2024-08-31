@@ -122,7 +122,7 @@ public class LineBotServiceImpl implements LineBotService {
             }
 
         } else{
-            return createTextMessage("請輸入 : 想了解，查看可以搜尋的類別");
+            return createTextMessage("請輸入 : '想了解'，查看商品分類。\n或輸入 : '找 關鍵字'，搜尋包含特定關鍵字的商品。");
         }
     }
     public Message createSearchOrderTextMessage(String orderNo) {
