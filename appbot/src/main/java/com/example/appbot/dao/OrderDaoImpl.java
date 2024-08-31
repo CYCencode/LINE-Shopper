@@ -152,7 +152,12 @@ public class OrderDaoImpl implements OrderDao{
         String sql = "SELECT id FROM orders WHERE order_no = :order_no";
         MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("order_no", orderNo);
-        return template.queryForObject(sql, params, Integer.class);
+
+        try {
+            return template.queryForObject(sql, params, Integer.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }
 

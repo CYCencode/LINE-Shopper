@@ -7,6 +7,7 @@ import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import org.slf4j.Logger;
@@ -28,8 +29,12 @@ public class LineBotMessageHandler {
     @EventMapping
     public Message handleMessageEvent(MessageEvent<TextMessageContent> event){
         logger.info("Handling message event: {}", event);
-        return lineBotService.handleTextMessage(event);
-
+        try {
+            return lineBotService.handleTextMessage(event);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new TextMessage("處理訊息錯誤，請稍後嘗試");
+        }
     }
     @EventMapping
     public Message handlePostbackEvent(PostbackEvent postbackEvent) {

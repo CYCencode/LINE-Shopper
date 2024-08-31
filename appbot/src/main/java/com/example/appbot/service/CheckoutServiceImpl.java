@@ -159,7 +159,7 @@ public class CheckoutServiceImpl implements CheckoutService{
         map.put("SenderCellPhone", "0912345678");
         map.put("SenderName", "Brian");
         map.put("SenderZipCode", "33441");
-        map.put("ServerReplyURL", "https://gorgeous-apparent-ape.ngrok-free.app");
+        map.put("ServerReplyURL", "https://gorgeous-apparent-ape.ngrok-free.app/api/v1/ecpayServerReply");
         String CMV = EncodingUtil.getCalculateCMV(map, ECPAY_HASH_KEY, ECPAY_HASH_IV);
         map.put("CheckMacValue", CMV);
 

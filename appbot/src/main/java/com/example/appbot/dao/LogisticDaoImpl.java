@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.MultiValueMap;
 
 @Repository
 public class LogisticDaoImpl implements LogisticDao{
@@ -71,5 +72,14 @@ public class LogisticDaoImpl implements LogisticDao{
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+
+    @Override
+    public Integer updateLogisticStatusByOrderNo(MultiValueMap<String, String> map) {
+        String sql = "UPDATE logistics SET status = :status WHERE order_no = :order_no";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("status", map.get("RtnCode"))
+            .addValue("order_no", map.get("MerchantTradeNo"));
+        return template.update(sql, params);
     }
 }

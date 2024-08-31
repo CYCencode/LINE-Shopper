@@ -3,11 +3,15 @@ package com.example.appbot.controller;
 import com.example.appbot.dao.CampaignDao;
 import com.example.appbot.dto.CampaignDTO;
 import com.example.appbot.service.CampaignService;
+import com.example.appbot.service.LogisticService;
 import com.example.appbot.service.OrderService;
 import com.example.appbot.service.ProductService;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,11 +25,13 @@ public class SearchController {
     private final ProductService productService;
     private final OrderService orderService;
     private final CampaignService campaignService;
+    private final LogisticService logisticService;
 
-    public SearchController(ProductService productService, OrderService orderService, CampaignService campaignService) {
+    public SearchController(ProductService productService, OrderService orderService, CampaignService campaignService, LogisticService logisticService) {
         this.productService = productService;
         this.orderService = orderService;
         this.campaignService = campaignService;
+        this.logisticService = logisticService;
     }
 
     @GetMapping("/product/searchAll")
@@ -70,16 +76,22 @@ public class SearchController {
     }
 
     @PostMapping("/campaign/search")
-    public ResponseEntity<?> searchCampaign(@RequestBody CampaignDTO campaignDTO) {
+    public ResponseEntity<?> searchCampaign(@RequestBody @Validated CampaignDTO campaignDTO) {
         Map<String, Object> map = new HashMap<>();
         map.put("data", campaignService.findCampaignList(campaignDTO));
         return ResponseEntity.ok(map);
     }
 
     @PostMapping("/campaign/create")
-    public ResponseEntity<?> createCampaign(@RequestBody CampaignDTO campaignDTO) {
+    public ResponseEntity<?> createCampaign(@RequestBody @Validated CampaignDTO campaignDTO) {
         Map<String, Object> map = new HashMap<>();
         map.put("data", campaignService.createCampaign(campaignDTO));
         return ResponseEntity.ok(map);
+    }
+
+    @PostMapping(path = "/ecpayServerReply", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public ResponseEntity<?> ecpayServerReply(@RequestBody MultiValueMap<String, String> map) {
+        logisticService.updateLogisticStatusByOrderNo(map);
+        return ResponseEntity.ok("1|OK");
     }
 }
