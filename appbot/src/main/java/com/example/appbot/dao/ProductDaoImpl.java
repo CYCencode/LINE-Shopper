@@ -5,6 +5,8 @@ import com.example.appbot.rowmapper.ProductDTORowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
@@ -92,5 +94,19 @@ public class ProductDaoImpl implements ProductDao {
                         .image(rs.getString("image"))
                         .build()
         );
+    }
+    @Override
+    public Integer createProduct(ProductDTO productDTO){
+        String sql = "INSERT INTO products (price, stock, category, name, image) " +
+                "VALUES (:price, :stock, :category, :name, :image)";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("price", productDTO.getPrice());
+        params.addValue("stock", productDTO.getStock());
+        params.addValue("category", productDTO.getCategory());
+        params.addValue("name", productDTO.getName());
+        params.addValue("image", productDTO.getImage());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        template.update(sql, params, keyHolder, new String[]{"id"});
+        return keyHolder.getKey().intValue();
     }
 }
