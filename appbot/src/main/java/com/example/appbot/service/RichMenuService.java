@@ -4,6 +4,7 @@ import com.example.appbot.dao.ProductDao;
 import com.example.appbot.dto.ProductDTO;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.action.MessageAction;
+import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
 import com.linecorp.bot.model.message.flex.component.Button;
@@ -143,7 +144,7 @@ public class RichMenuService {
                                 Button.builder()
                                         .style(Button.ButtonStyle.LINK)
                                         .height(Button.ButtonHeight.SMALL)
-                                        .action(new MessageAction("加入購物車", "加入購物車 " + product.getId()))
+                                        .action(new PostbackAction("加入購物車", "action=add_to_cart&product_id="+product.getId()+"&product_name="+product.getName()))
                                         .build()
                         ))
                         .build())
