@@ -59,8 +59,8 @@ nav {
 }
 
 .red-btn, .blue-btn {
-    padding: 16px 32px;
-    font-size: 18px;
+    padding: 8px 16px;
+    font-size: 14px;
     color: white;
     border: none;
     border-radius: 4px;
@@ -133,4 +133,40 @@ nav {
 .form-group label {
     display: block;
     margin-bottom: 5px;
+}
+.add-product-btn,
+.submit-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.add-product-btn {
+    background-color: #4CAF50;
+    color: white;
+    margin-right: 10px;
+}
+
+.add-product-btn:hover {
+    background-color: #45a049;
+}
+
+.submit-btn {
+    background-color: #008CBA;
+    color: white;
+}
+
+.submit-btn:hover {
+    background-color: #007B9A;
+}
+
+@media (max-width: 600px) {
+    .add-product-btn,
+    .submit-btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }
