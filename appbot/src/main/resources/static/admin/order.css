@@ -78,7 +78,7 @@ nav {
     font-size: 14px;
 }
 
-#searchInput {
+.searchInput {
     padding: 8px 16px;
     border: 1px solid lightgray;
     border-radius: 4px;
@@ -86,9 +86,32 @@ nav {
 }
 
 .mainContainer {
-    display: flexbox;
+    /* display: flexbox; */
     width: 90%;
     margin: auto;
-    flex-direction: column;
-    justify-content: center;
+    /* flex-direction: column;
+    justify-content: center; */
+}
+
+/* product */
+.product-container {
+    width: 800px;
+    display: inline-flex;
+    align-items: center;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.product-image img {
+    max-width: 200px; /* 調整圖片的寬度 */
+    height: auto;
+    border-radius: 8px;
+}
+
+.product-details {
+    margin-left: 20px;
+    font-size: 16px;
+    color: #333;
 }
