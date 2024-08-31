@@ -54,7 +54,7 @@ public class RichMenuService {
         try {
             RichMenu richMenu = RichMenu.builder()
                     .name("Half-Screen Rich Menu")
-                    .chatBarText("選單")
+                    .chatBarText("輸入想了解，查看商品分類")
                     .areas(createRichMenuAreas())
                     .selected(true)
                     .size(new RichMenuSize(2500, 843))
