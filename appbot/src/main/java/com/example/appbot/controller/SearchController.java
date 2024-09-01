@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,24 +55,26 @@ public class SearchController {
         return ResponseEntity.ok(map);
     }
     @PostMapping("/product/create")
-    public ResponseEntity<?> createProducts(@Valid @RequestBody List<ProductDTO> products,
-                                            BindingResult bindingResult,
+    public ResponseEntity<?> createProducts(@RequestParam Map<String, String> formData,
                                             @RequestParam("images") List<MultipartFile> images) {
-        if (bindingResult.hasErrors()) {
-            List<String> errors = bindingResult.getAllErrors().stream()
-                    .map(error -> {
-                        if (error instanceof FieldError) {
-                            return ((FieldError) error).getField() + ": " + error.getDefaultMessage();
-                        }
-                        return error.getDefaultMessage();
-                    })
-                    .collect(Collectors.toList());
-            return ResponseEntity.badRequest().body(errors);
+        List<ProductDTO> products = new ArrayList<>();
+        int index = 0;
+        while (formData.containsKey("products[" + index + "].name")) {
+            ProductDTO product = new ProductDTO();
+            product.setName(formData.get("products[" + index + "].name"));
+            product.setPrice(Integer.parseInt(formData.get("products[" + index + "].price")));
+            product.setStock(Integer.parseInt(formData.get("products[" + index + "].stock")));
+            product.setCategory(formData.get("products[" + index + "].category"));
+            products.add(product);
+            index++;
         }
 
         List<Integer> productIds = productService.createProducts(products, images);
-        return ResponseEntity.ok(productIds);
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", productIds);
+        return ResponseEntity.ok(response);
     }
+
 
 
     @GetMapping("/order/search")
