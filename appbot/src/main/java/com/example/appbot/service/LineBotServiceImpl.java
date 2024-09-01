@@ -98,11 +98,10 @@ public class LineBotServiceImpl implements LineBotService {
         else if ("結帳".equals(userMessage)) {
             try {
                 Integer orderId = orderDao.findCartByUserId(userId);
-                Integer total = orderDao.getTotalByOrderId(orderId);
                 if (orderId == null) {
                     throw new CheckoutException("購物車內無商品");
                 }
-
+                Integer total = orderDao.getTotalByOrderId(orderId);
                 String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s&total=%s", WEB_PAGE_CHECKOUT,userId, orderId, total);
                 return TextMessage.builder()
                         .text("是否進行結帳")
@@ -120,6 +119,7 @@ public class LineBotServiceImpl implements LineBotService {
                 return new TextMessage(e.getMessage());
             }
             catch (Exception e) {
+                logger.info(e.getMessage());
                 return new TextMessage("不可結帳");
             }
 
