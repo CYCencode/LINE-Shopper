@@ -242,7 +242,7 @@ public class LineBotServiceImpl implements LineBotService {
             try {
                 String imageUrl = s3Service.getFileUrl(dto.getImage());
                 String title = dto.getName();
-                String text = dto.getPrice().toString();
+                String text = "NT$ "+dto.getPrice().toString();
                 String productId = dto.getId().toString();
                 colList.add(
                         CarouselColumn.builder()
