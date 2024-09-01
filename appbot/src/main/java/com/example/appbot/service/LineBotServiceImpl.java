@@ -7,6 +7,7 @@ import com.example.appbot.dao.ProductDao;
 import com.example.appbot.dto.LogisticDTO;
 import com.example.appbot.dto.OrderDetailDTO;
 import com.example.appbot.dto.ProductDTO;
+import com.example.appbot.exception.CheckoutException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
@@ -99,7 +100,7 @@ public class LineBotServiceImpl implements LineBotService {
                 Integer orderId = orderDao.findCartByUserId(userId);
                 Integer total = orderDao.getTotalByOrderId(orderId);
                 if (orderId == null) {
-                    throw new RuntimeException("購物車內無商品");
+                    throw new CheckoutException("購物車內無商品");
                 }
 
                 String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s&total=%s", WEB_PAGE_CHECKOUT,userId, orderId, total);
@@ -115,7 +116,7 @@ public class LineBotServiceImpl implements LineBotService {
                                         .build()
                         )
                         .build();
-            } catch (RuntimeException e) {
+            } catch (CheckoutException e) {
                 return new TextMessage(e.getMessage());
             }
             catch (Exception e) {
