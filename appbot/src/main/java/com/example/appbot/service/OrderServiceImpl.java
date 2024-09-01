@@ -10,9 +10,11 @@ import com.example.appbot.dto.OrderDTO;
 import com.example.appbot.dto.PaymentDTO;
 import com.example.appbot.enums.LimitAmount;
 import com.example.appbot.enums.StatusCode;
+import com.example.appbot.exception.CheckoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void addToCart(String userId, String productId) {
         Integer cartId = orderDao.findCartByUserId(userId);
         String userName = lineBotService.getUserProfile(userId);
@@ -57,6 +60,10 @@ public class OrderServiceImpl implements OrderService {
             orderDetailDao.incQtyOrderDetailByOrderId(cartId, Integer.valueOf(productId));
         } else {
             orderDetailDao.addOrderDetail(cartId, Integer.valueOf(productId), LimitAmount.ADD_CART_AMOUNT.ordinal());
+        }
+        Integer insufficientCount = orderDetailDao.getOrderDetailInsufficientCountByOrderId(cartId);
+        if (insufficientCount > 0) {
+            throw new CheckoutException("商品庫存不足");
         }
         List<OrderDetailDTO> orderDetails = orderDao.updateOrderTotal(cartId);
         logger.info("Updated order details for cartId {}: {}", cartId, orderDetails);

@@ -52,6 +52,7 @@ public class CheckoutServiceImpl implements CheckoutService{
     private static  final SimpleDateFormat sdfTradeDate = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private static final SimpleDateFormat sdfTradeNo = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 
+    private final ProductDao productDao;
     private final OrderDao orderDao;
     private final OrderDetailDao orderDetailDao;
     private final PaymentDao paymentDao;
@@ -59,7 +60,8 @@ public class CheckoutServiceImpl implements CheckoutService{
     private final RestTemplate restTemplate;
     private final LineMessagingClient lineMessagingClient;
 
-    public CheckoutServiceImpl(OrderDao orderDao, OrderDetailDao orderDetailDao, PaymentDao paymentDao, LogisticDao logisticDao, RestTemplate restTemplate, LineMessagingClient lineMessagingClient) {
+    public CheckoutServiceImpl(ProductDao productDao, OrderDao orderDao, OrderDetailDao orderDetailDao, PaymentDao paymentDao, LogisticDao logisticDao, RestTemplate restTemplate, LineMessagingClient lineMessagingClient) {
+        this.productDao = productDao;
         this.orderDao = orderDao;
         this.orderDetailDao = orderDetailDao;
         this.paymentDao = paymentDao;
@@ -84,6 +86,7 @@ public class CheckoutServiceImpl implements CheckoutService{
                 orderNo = orderDTO.getOrderNo();
             }
 
+            verifyProductStock(orderId);
             verifyLogistic(crDTO, orderDTO);
             verifyPayment(crDTO, orderDTO);
             orderDao.updateOrderStatus(orderId, StatusCode.ORDER_STATUS_PAID.ordinal());
@@ -98,6 +101,15 @@ public class CheckoutServiceImpl implements CheckoutService{
         } finally {
             replyUser(crDTO.getLineUserId(), msg);
         }
+    }
+
+    @Override
+    public void verifyProductStock(Integer orderId) {
+        Integer insufficientCount = orderDetailDao.getOrderDetailInsufficientCountByOrderId(orderId);
+        if (insufficientCount > 0) {
+            throw new CheckoutException("庫存不足，請稍後結帳");
+        }
+        Integer updateCount = productDao.updateStockByOrderId(orderId);
     }
 
     @Override

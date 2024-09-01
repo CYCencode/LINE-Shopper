@@ -1,5 +1,6 @@
 package com.example.appbot.handler;
 
+import com.example.appbot.exception.CheckoutException;
 import com.example.appbot.service.LineBotService;
 import com.example.appbot.service.OrderService;
 import com.example.appbot.util.PostbackDataParser;
@@ -48,8 +49,14 @@ public class LineBotMessageHandler {
         String productName = postbackData.get("product_name");
 
         if ("add_to_cart".equals(actionValue)) {
-            orderService.addToCart(userId, productId);
-            return lineBotService.createCartQuickReplyMessage(userId, productName + " 已加入購物車");
+            try {
+                orderService.addToCart(userId, productId);
+                return lineBotService.createCartQuickReplyMessage(userId, productName + " 已加入購物車");
+            } catch (CheckoutException e) {
+                return lineBotService.createCartQuickReplyMessage(userId, productName + " " + e.getMessage());
+            } catch (Exception e) {
+                return new TextMessage("系統忙碌中，請稍後");
+            }
         }
         return null;
     }

@@ -123,4 +123,28 @@ public class OrderDetailDaoImpl implements OrderDetailDao {
             return List.of();
         }
     }
+
+    // 計算購物車內要結帳的商品條目數量
+    @Override
+    public Integer getOrderDetailCountByOrderId(Integer orderId) {
+        String sql = "SELECT count(*) FROM products p " +
+            "INNER JOIN order_details od ON p.id = od.product_id " +
+            "WHERE p.stock >= 0 AND od.order_id = :order_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("order_id", orderId);
+
+        return template.queryForObject(sql, params, Integer.class);
+    }
+
+    // 計算購物車內要結帳的商品條目是否有庫存不足夠的商品
+    @Override
+    public Integer getOrderDetailInsufficientCountByOrderId(Integer orderId) {
+        String sql = "SELECT count(*) FROM products p " +
+            "INNER JOIN order_details od ON p.id = od.product_id " +
+            "WHERE p.stock >= 0 AND p.stock < od.quantity AND od.order_id = :order_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("order_id", orderId);
+
+        return template.queryForObject(sql, params, Integer.class);
+    }
 }
