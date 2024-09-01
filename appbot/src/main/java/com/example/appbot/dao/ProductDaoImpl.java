@@ -109,4 +109,16 @@ public class ProductDaoImpl implements ProductDao {
         template.update(sql, params, keyHolder, new String[]{"id"});
         return keyHolder.getKey().intValue();
     }
+
+    @Override
+    public Integer updateStockByOrderId(Integer orderId) {
+        String sql = "UPDATE products p " +
+            "INNER JOIN order_details od ON p.id = od.product_id " +
+            "SET p.stock = p.stock - od.quantity " +
+            "WHERE p.stock >= 0 AND p.stock >= od.quantity AND od.order_id = :order_id";
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("order_id", orderId);
+
+        return template.update(sql, params);
+    }
 }
