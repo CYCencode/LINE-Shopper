@@ -56,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
         if (detailCount > 0) {
             orderDetailDao.incQtyOrderDetailByOrderId(cartId, Integer.valueOf(productId));
         } else {
-            orderDetailDao.addOrderDetail(cartId, Integer.valueOf(productId), LimitAmount.FIND_PRODUCT_AMOUNT.ordinal());
+            orderDetailDao.addOrderDetail(cartId, Integer.valueOf(productId), LimitAmount.ADD_CART_AMOUNT.ordinal());
         }
         List<OrderDetailDTO> orderDetails = orderDao.updateOrderTotal(cartId);
         logger.info("Updated order details for cartId {}: {}", cartId, orderDetails);

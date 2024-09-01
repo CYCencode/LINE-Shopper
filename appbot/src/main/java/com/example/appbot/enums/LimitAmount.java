@@ -2,7 +2,7 @@ package com.example.appbot.enums;
 
 public enum LimitAmount {
     EMPTY,
-    EMPTY1,
+    ADD_CART_AMOUNT,
     EMPTY2,
     EMPTY3,
     EMPTY4,
