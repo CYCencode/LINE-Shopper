@@ -5,8 +5,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // 添加第一個商品表單
     addProductForm();
 
+
     // 綁定登出按鈕事件
-    document.getElementById('logoutBtn').addEventListener('click', logout);
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
 });
 
 // 添加新的商品表單
@@ -86,5 +90,9 @@ function resetForms() {
     document.getElementById('productFormsContainer').innerHTML = '';
     productIndex = 0;
     addProductForm();
+}
+
+function logout() {
+    location.href = "/logout";
 }
 
