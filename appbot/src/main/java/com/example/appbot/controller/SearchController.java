@@ -1,5 +1,6 @@
 package com.example.appbot.controller;
 
+import org.springframework.validation.BindingResult;
 import com.example.appbot.dao.CampaignDao;
 import com.example.appbot.dto.CampaignDTO;
 import com.example.appbot.dto.ProductDTO;
@@ -7,19 +8,20 @@ import com.example.appbot.service.CampaignService;
 import com.example.appbot.service.LogisticService;
 import com.example.appbot.service.OrderService;
 import com.example.appbot.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -52,25 +54,25 @@ public class SearchController {
         return ResponseEntity.ok(map);
     }
     @PostMapping("/product/create")
-    public ResponseEntity<?> createProducts(@RequestParam Map<String, String> formData,
+    public ResponseEntity<?> createProducts(@Valid @RequestBody List<ProductDTO> products,
+                                            BindingResult bindingResult,
                                             @RequestParam("images") List<MultipartFile> images) {
-        List<ProductDTO> products = new ArrayList<>();
-        int index = 0;
-        while (formData.containsKey("products[" + index + "].name")) {
-            ProductDTO product = new ProductDTO();
-            product.setName(formData.get("products[" + index + "].name"));
-            product.setPrice(Integer.parseInt(formData.get("products[" + index + "].price")));
-            product.setStock(Integer.parseInt(formData.get("products[" + index + "].stock")));
-            product.setCategory(formData.get("products[" + index + "].category"));
-            products.add(product);
-            index++;
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getAllErrors().stream()
+                    .map(error -> {
+                        if (error instanceof FieldError) {
+                            return ((FieldError) error).getField() + ": " + error.getDefaultMessage();
+                        }
+                        return error.getDefaultMessage();
+                    })
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errors);
         }
 
         List<Integer> productIds = productService.createProducts(products, images);
-        Map<String, Object> response = new HashMap<>();
-        response.put("data", productIds);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(productIds);
     }
+
 
     @GetMapping("/order/search")
     public ResponseEntity<?> searchOrder(@RequestParam(value = "orderNo", required = false) String orderNo,
