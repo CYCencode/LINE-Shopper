@@ -81,8 +81,8 @@ public class LineBotServiceImpl implements LineBotService {
         if ("想了解".equals(userMessage)) {
             return createQuickReplyMessage();
         }else if("男裝".equals(userMessage)|| "女裝".equals(userMessage) || "飾品".equals(userMessage)) {
-            ProductDTO productDTO = productDao.findProductByCategory(LimitAmount.FIND_PRODUCT_AMOUNT.ordinal(), userMessage).get(0);
-            return createProductButtonsTemplate(productDTO);
+            List<ProductDTO> dtoList = productDao.findProductByCategory(LimitAmount.FIND_PRODUCT_AMOUNT.ordinal(), userMessage);
+            return createCarouselMessage(dtoList);
         } else if (userMessage.startsWith("找 ")) {
             userMessage = userMessage.replace("找 ", "");
             List<ProductDTO> dtoList = productDao.findProductByKeyword(userMessage);
