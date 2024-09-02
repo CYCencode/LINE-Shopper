@@ -1,6 +1,29 @@
+let productContainer;
+function searchProductById(id) {
+    fetch(`/api/v1/product/${id}`)
+    .then(r => r.json())
+    .then(data => {
+        d = data.data[0]
+        productContainer.innerHTML = ""
+        let tr = `
+            <div class="product-image">
+                <img src="https://91-app.s3.ap-northeast-1.amazonaws.com/${d.image}" alt="Product Image">
+            </div>
+            <div class="product-details">
+                <p>ID: ${d.id}</p>
+                <p>名稱: ${d.name}</p>
+                <p>價格: ${d.price}</p>
+                <p>庫存: ${d.stock}</p>
+                <p>類別: ${d.category}</p>
+            </div>
+        `
+        productContainer.innerHTML += tr
+    })
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const campaignTable = document.querySelector("#campaignTable")
-    const productContainer = document.querySelector("#product-container")
+    productContainer = document.querySelector("#product-container")
 
     const campaignNameInput = document.querySelector("#campaignNameInput")
     const createAtInput = document.querySelector("#createAtInput")
@@ -15,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cDiscoutRateInput = document.querySelector("#cDiscoutRateInput")
     const createBtn = document.querySelector("#createBtn")
 
-    function search() {
+    function searchCampaign() {
         fetch("/api/v1/campaign/search", {
             headers: {
                 "Content-Type": "application/json"
@@ -37,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <tr>
                         <td>${d.id}</td>
                         <td>${d.name}</td>
-                        <td>${d.productId}</td>
+                        <td><button type='button' onclick='searchProductById(${d.productId})'>${d.productId}</button></td>
                         <td>${d.createAt}</td>
                         <td>${d.terminateAt}</td>
                         <td>${d.discountRate * 100}%</td>
@@ -76,10 +99,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return true;
     }
 
-    search()
+    searchCampaign()
     getAllProduct()
     searchBtn.addEventListener("click",() =>{
-        search()
+        searchCampaign()
     })
 
     createBtn.addEventListener("click", () => {
@@ -104,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(data => {
             if (data.data) {
                 alert(`已新增促銷活動ID:${data.data}`)
-                search()
+                searchCampaign()
             } else {
                 alert(`${data.msg}`)
             }             
@@ -112,25 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     cProductIdInput.addEventListener("change", () => {
-        fetch(`/api/v1/product/${cProductIdInput.value}`)
-        .then(r => r.json())
-        .then(data => {
-            d = data.data[0]
-            console.log(d)
-            productContainer.innerHTML = ""
-            let tr = `
-                <div class="product-image">
-                    <img src="https://91-app.s3.ap-northeast-1.amazonaws.com/${d.image}" alt="Product Image">
-                </div>
-                <div class="product-details">
-                    <p>ID: ${d.id}</p>
-                    <p>名稱: ${d.name}</p>
-                    <p>價格: ${d.price}</p>
-                    <p>庫存: ${d.stock}</p>
-                    <p>類別: ${d.category}</p>
-                </div>
-            `
-            productContainer.innerHTML += tr
-        })
+        searchProductById(cProductIdInput.value)
     })
 })

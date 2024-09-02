@@ -96,6 +96,7 @@ nav {
 /* product */
 .product-container {
     width: 800px;
+    height: 33vh;
     display: inline-flex;
     align-items: center;
     background-color: #f4f4f4;
