@@ -35,8 +35,8 @@ public class SecurityConfig {
                 }
             )
 //            .userDetailsService(userDetailsService)
-            .formLogin(Customizer.withDefaults())
-            .logout(Customizer.withDefaults())
+            .formLogin(form -> form.permitAll())
+            .logout(logout -> logout.permitAll())
             .build();
     }
 
