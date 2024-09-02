@@ -24,6 +24,7 @@ function searchProductById(id) {
 document.addEventListener("DOMContentLoaded", () => {
     const campaignTable = document.querySelector("#campaignTable")
     productContainer = document.querySelector("#product-container")
+    const logoutBtn = document.querySelector("#logoutBtn")
 
     const campaignNameInput = document.querySelector("#campaignNameInput")
     const createAtInput = document.querySelector("#createAtInput")
@@ -103,6 +104,10 @@ document.addEventListener("DOMContentLoaded", () => {
     getAllProduct()
     searchBtn.addEventListener("click",() =>{
         searchCampaign()
+    })
+
+    logoutBtn.addEventListener("click",() => {
+        location.href = "/logout";
     })
 
     createBtn.addEventListener("click", () => {
