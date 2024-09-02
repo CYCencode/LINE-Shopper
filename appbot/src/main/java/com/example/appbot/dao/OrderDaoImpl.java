@@ -100,10 +100,11 @@ public class OrderDaoImpl implements OrderDao{
         ZonedDateTime now = ZonedDateTime.now(getTimeZone());
         String date = now.format(DateTimeFormatter.ofPattern("yyMMdd"));
         char hour = (char)('A'+now.getHour());
-        String sql ="SELECT COUNT(*) FROM orders WHERE DATE(create_at) = :today AND order_status = :order_status";
+        String sql ="SELECT COUNT(*) FROM orders WHERE DATE(create_at) = :today";
+        //AND order_status = :order_status
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("today", now.toLocalDate())
-            .addValue("order_status", StatusCode.ORDER_STATUS_PAID.ordinal());
+        params.addValue("today", now.toLocalDate());
+            //.addValue("order_status", StatusCode.ORDER_STATUS_PAID.ordinal());
 
         Integer count = template.queryForObject(sql, params, Integer.class);
         String serialNumber = String.format("%06d", count+1);
