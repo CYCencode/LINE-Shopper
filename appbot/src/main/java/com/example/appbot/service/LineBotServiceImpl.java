@@ -93,7 +93,7 @@ public class LineBotServiceImpl implements LineBotService {
             return richMenuService.createCampaignFlexMessage();
         }else if (userMessage.startsWith("ST") && userMessage.length() == 15) {
             String orderNo = userMessage;
-            return createSearchOrderTextMessage(orderNo);
+            return createSearchOrderTextMessage(orderNo,userId);
         }
         else if ("結帳".equals(userMessage)) {
             try {
@@ -127,10 +127,10 @@ public class LineBotServiceImpl implements LineBotService {
             return createTextMessage("請輸入 : '想了解'，查看商品分類。\n或輸入 : '找 關鍵字'，搜尋包含特定關鍵字的商品。");
         }
     }
-    public Message createSearchOrderTextMessage(String orderNo) {
+    public Message createSearchOrderTextMessage(String orderNo, String userId) {
         try{
             // 先取得對應的 order_id
-            Integer orderId = orderDao.findOrderIdByOrderNo(orderNo);
+            Integer orderId = orderDao.findOrderIdByOrderNo(orderNo, userId);
             if (orderId == null) {
                 return createTextMessage("找不到訂單編號為 " + orderNo + " 的訂單。");
             }

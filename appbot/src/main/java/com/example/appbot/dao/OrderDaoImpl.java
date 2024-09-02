@@ -147,10 +147,11 @@ public class OrderDaoImpl implements OrderDao{
         return template.query(sb.toString(), params, new OrderDTORowMapper());
     }
     @Override
-    public Integer findOrderIdByOrderNo(String orderNo){
-        String sql = "SELECT id FROM orders WHERE order_no = :order_no";
+    public Integer findOrderIdByOrderNo(String orderNo, String userId){
+        String sql = "SELECT id FROM orders WHERE order_no = :order_no AND line_user_id = :line_user_id";
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("order_no", orderNo);
+        params.addValue("order_no", orderNo)
+                .addValue("line_user_id", userId);
 
         try {
             return template.queryForObject(sql, params, Integer.class);
