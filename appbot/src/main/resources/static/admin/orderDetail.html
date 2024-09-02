@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>訂單明細</title>
+    <link rel="stylesheet" href="order.css">
+    <script src="orderDetail.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul id="menu">
+               <li><a class="menuLink" href="/admin/order.html">訂單管理</a></li>
+               <li><a class="menuLink" href="/admin/campaign.html">活動管理</a></li>
+                <li><a class="menuLink" href="/admin/product.html">商品管理</a></li>
+            </ul>
+            <button id="logoutBtn" class="red-btn">登出</button>
+        </nav>
+    </header>
+    <main>
+        <div class="mainContainer">
+            <table>
+                <h1>商品購買清單</h1>
+                <thead>
+                <tr>
+                    <th>商品名稱</th>
+                    <th>商品數量</th>
+                    <th>商品原始單價</th>
+                    <th>商品特價單價</th>
+                    <th>商品小計</th>
+                </tr>
+                </thead>
+                <tbody id="orderDetailTable">
+                </tbody>
+            </table>
+            <table>
+                <h1>物流資訊</h1>
+                <thead>
+                <tr>
+                    <th>訂單編號</th>
+                    <th>物流訂單編號</th>
+                    <th>托運單號</th>
+                    <th>運送方式</th>
+                    <th>物流狀態</th>
+                </tr>
+                </thead>
+                <tbody id="orderLogisticTable">
+                </tbody>
+            </table>
+            <table>
+                <thead>
+                <tr>
+                    <th>買家姓名</th>
+                    <th>買家手機</th>
+                    <th>買家信箱</th>
+                    <th>寄送地址</th>
+                    <th>郵遞區號</th>
+                </tr>
+                </thead>
+                <tbody id="orderLogistic2Table">
+                </tbody>
+            </table>
+            <table>
+                <h1>付款資訊</h1>
+                <thead>
+                <tr>
+                    <th>交易紀錄編號</th>
+                    <th>銀行交易編號</th>
+                    <th>交易方法</th>
+                    <th>價格</th>
+                    <th>交易貨幣</th>
+                    <th>交易時間</th>
+                </tr>
+                </thead>
+                <tbody id="orderPaymentTable">
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

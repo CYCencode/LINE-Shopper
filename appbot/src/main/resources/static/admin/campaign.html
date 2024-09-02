@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>促銷活動管理頁面</title>
+    <link rel="stylesheet" href="order.css">
+    <script src="campaign.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul id="menu">
+               <li><a class="menuLink" href="/admin/order.html">訂單管理</a></li>
+               <li><a class="menuLink" href="/admin/campaign.html">活動管理</a></li>
+                <li><a class="menuLink" href="/admin/product.html">商品管理</a></li>
+            </ul>
+            <button id="logoutBtn" class="red-btn">登出</button>
+        </nav>
+    </header>
+    <main>
+        <div class="mainContainer">
+            <br>
+            <h1>商品資訊</h1>
+            <div id="product-container" class="product-container">
+            </div>
+            <h1>活動新增</h1>
+            <div style="display: inline-block;">
+                <input id="cNameInput" class="searchInput" type="text" placeholder="活動名稱">
+                <select id="cProductIdInput" class="searchInput"></select>
+                <span>起:</span>
+                <input id="cCreateAtInput" class="searchInput" type="datetime-local" placeholder="開始日期">
+                <span>訖:</span>
+                <input id="cTerminateAtInput" class="searchInput" type="datetime-local" placeholder="結束日期">
+                <input id="cDiscoutRateInput" class="searchInput" type="number" step=".05" min="0" max="1" value="0.9" placeholder="折扣優惠">
+                <button id="createBtn" class="blue-btn" type="button">新增</button>
+            </div>
+
+            <h1>促銷活動查詢</h1>
+            <div style="display: inline-block;">
+                <input id="campaignNameInput" class="searchInput" type="text" placeholder="活動名稱">
+                <span>起:</span>
+                <input id="createAtInput" class="searchInput" type="datetime-local" placeholder="開始日期">
+                <span>訖:</span>
+                <input id="terminateAtInput" class="searchInput" type="datetime-local" placeholder="結束日期">
+                <input id="discoutRateInput" class="searchInput" type="number" step=".05" placeholder="折扣優惠">
+                <button id="searchBtn" class="blue-btn" type="button">搜尋</button>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>活動ID</th>
+                    <th>活動名稱</th>
+                    <th>商品ID</th>
+                    <th>開始日期</th>
+                    <th>結束日期</th>
+                    <th>促銷優惠</th>
+                </tr>
+                </thead>
+                <tbody id="campaignTable">
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

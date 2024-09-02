@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>結帳</title>
+    <script src="https://js.tappaysdk.com/sdk/tpdirect/v5.14.0"></script>
+    <script src="config/config.js"></script>
+    <style>
+        :root {
+            --primary-color: #333;
+            --primary-color-hover: #222;
+            --secondary-color: #f4f4f4;
+            --text-color: #333;
+            --error-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--secondary-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1, h3 {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .tpfield {
+            height: 40px;
+            width: 100%;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            padding: 5px;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+
+        input.error {
+            border-color: var(--error-color);
+        }
+
+        .blue-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .blue-btn:hover {
+            background-color: var(--primary-color-hover);
+        }
+
+        .blue-btn:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        #customAlert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .alert-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #alertConfirm {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        #alertConfirm:hover {
+            background-color: #3a7ab5;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            .form-group {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>結帳</h1>
+    <div class="form-group">
+        <h3>付款資訊</h3>
+        <div>
+            <input type="radio" id="payment_method" name="payment_method" value="TapPay" checked>
+            <label for="payment_method">信用卡付款</label>
+        </div>
+        <div>
+            <label for="card-number">信用卡號碼</label>
+            <div class="tpfield" id="card-number"></div>
+        </div>
+        <div>
+            <label for="card-expiration-date">有效期限</label>
+            <div class="tpfield" id="card-expiration-date"></div>
+        </div>
+        <div>
+            <label for="card-ccv">安全碼</label>
+            <div class="tpfield" id="card-ccv"></div>
+        </div>
+        <div class="total-amount">
+            總金額 : <span id="total-amount-display"></span> 元
+        </div>
+    </div>
+    <div class="form-group">
+        <h3>黑貓宅配資訊</h3>
+        <div>
+            <label for="receiver_name">收件人姓名</label>
+            <input type="text" id="receiver_name" name="receiver_name" class="form-control" placeholder="請輸入收件人姓名" required />
+            <div id="receiver_name_error" class="error-message"></div>
+        </div>
+        <div>
+            <label for="receiver_phone">收件人電話</label>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" id="receiver_phone" name="receiver_phone" class="form-control" placeholder="請輸入收件人電話" required />
+            <div id="receiver_phone_error" class="error-message"></div>
+        </div>
+        <div>
+            <label for="receiver_address">收件人地址</label>
+            <input type="text" id="receiver_address" name="receiver_address" class="form-control" placeholder="請輸入收件人地址" required />
+            <div id="receiver_address_error" class="error-message"></div>
+        </div>
+        <div>
+            <label for="receiver_zipcode">收件人郵遞區號</label>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" id="receiver_zipcode" name="receiver_zipcode" class="form-control" placeholder="請輸入郵遞區號" required />
+            <div id="receiver_zipcode_error" class="error-message"></div>
+        </div>
+        <div>
+            <label for="receiver_email">收件人電子郵件</label>
+            <input type="email" id="receiver_email" name="receiver_email" class="form-control" placeholder="請輸入電子郵件" required />
+            <div id="receiver_email_error" class="error-message"></div>
+        </div>
+    </div>
+    <button id="checkoutBtn" class="blue-btn" onclick="onSubmit()">結帳</button>
+</div>
+
+<script>
+    const confirm_redirect_url = 'https://line.me/R/ti/p/'+line_endpoint;
+    const APP_ID = '12348';
+    const APP_KEY = 'app_pa1pQcKoY22IlnSXq5m5WP5jFKzoRG58VEXpT7wU62ud7mMbDOGzCYIlzzLF';
+    TPDirect.setupSDK(APP_ID, APP_KEY, 'sandbox');
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const fields = {
+            number: {
+                element: '#card-number',
+                placeholder: '**** **** **** ****'
+            },
+            expirationDate: {
+                element: '#card-expiration-date',
+                placeholder: 'MM / YY'
+            },
+            ccv: {
+                element: '#card-ccv',
+                placeholder: 'ccv'
+            }
+        };
+
+        const styles = {
+            'input': {
+                'color': 'gray'
+            },
+            ':focus': {
+                'color': 'black'
+            },
+            '.valid': {
+                'color': 'green'
+            },
+            '.invalid': {
+                'color': 'red'
+            }
+        };
+
+        TPDirect.card.setup({
+            fields: fields,
+            styles: styles
+        });
+    const url_params = new URLSearchParams(window.location.search);
+    const totalAmount = url_params.get('total');
+    document.getElementById('total-amount-display').textContent = totalAmount;
+    });
+    function customAlert(message, callback) {
+        const alertDiv = document.createElement('div');
+        alertDiv.id = 'customAlert';
+        alertDiv.innerHTML = `
+                <div class="alert-content">
+                    <p>${message}</p>
+                    <button id="alertConfirm">確認</button>
+                </div>
+            `;
+        document.body.appendChild(alertDiv);
+
+        document.getElementById('alertConfirm').onclick = function() {
+            document.body.removeChild(alertDiv);
+            if (callback) callback();
+        };
+    }
+
+    function onSubmit(){
+        const checkoutBtn = document.querySelector("#checkoutBtn")
+        checkoutBtn.disabled=true
+
+        if(!validateForm()){
+            checkoutBtn.disabled=false
+            return;
+        }
+        const url_params = new URLSearchParams(window.location.search);
+        const line_user_id = url_params.get('line_user_id');
+        const cart_id = url_params.get('cart_id');
+        const payment_method = document.querySelector('input[name=payment_method]:checked').value;
+        TPDirect.card.getPrime(function(result){
+            if (result.status !== 0){
+                alert('信用卡資訊不正確，交易失敗');
+                checkoutBtn.disabled=false
+                return;
+            }
+            const prime = result.card.prime;
+            const receiver_name = document.getElementById('receiver_name').value;
+            const receiver_phone = document.getElementById('receiver_phone').value;
+            const receiver_address = document.getElementById('receiver_address').value;
+            const receiver_zipcode = document.getElementById('receiver_zipcode').value;
+            const receiver_email = document.getElementById('receiver_email').value;
+            console.log("Prime : "+prime);
+            const order_data = {
+                prime: prime,
+                payment_method: payment_method,
+                line_user_id: line_user_id,
+                cart_id: cart_id,
+                receiver_name: receiver_name,
+                receiver_phone: receiver_phone,
+                receiver_address: receiver_address,
+                receiver_zipcode: receiver_zipcode,
+                receiver_email: receiver_email,
+            };
+            fetch('api/v1/order/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(order_data)
+            })
+                .then(response=> response.json())
+                .then(data => {
+                    checkoutBtn.disabled=false
+                    if(data.success){
+                        customAlert(data.msg, function(){
+                            window.location.href=confirm_redirect_url;
+                        });
+                    }
+                    else{
+                        alert(data.msg);
+                    }
+                })
+                .catch(error=>{
+                    checkoutBtn.disabled=false
+                    console.error("Error: ", error);
+                    alert("提交訂單時發生錯誤！請稍後再試");
+                });
+        });
+    }
+    function validateField(field, pattern, errorMessage) {
+        const value = field.value;
+        const isValid = pattern.test(value);
+        const errorElement = document.getElementById(field.id + '_error');
+
+        if (!isValid) {
+            field.classList.add('error');
+            errorElement.textContent = errorMessage;
+            field.setAttribute('data-valid', 'false');
+        } else {
+            field.classList.remove('error');
+            errorElement.textContent = '';
+            field.setAttribute('data-valid', 'true');
+        }
+    }
+
+    function validateForm() {
+        const fields = [
+            {
+                id: 'receiver_name',
+                pattern: /^([\u4e00-\u9fa5]{2,5}|[a-zA-Z]{4,10})$/,
+                errorMessage: "收件人姓名必須是2-5個中文字或4-10個半形英文字符，不可以帶數字與特殊符號"
+            },
+            {
+                id: 'receiver_phone',
+                pattern: /^09\d{8}$/,
+                errorMessage: "收件人電話必須是09開頭的10位數字"
+            },
+            {
+                id: 'receiver_address',
+                pattern: /.{6,60}$/,
+                errorMessage: "收件人地址必須是6-60個中文字"
+            },
+            {
+                id: 'receiver_zipcode',
+                pattern: /^\d{1,6}$/,
+                errorMessage: "收件人郵遞區號必須是6位內的數字"
+            },
+            {
+                id: 'receiver_email',
+                pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                errorMessage: "請輸入有效的電子郵件地址"
+            }
+        ];
+
+        fields.forEach(field => {
+            const element = document.getElementById(field.id);
+            validateField(element, field.pattern, field.errorMessage);
+        });
+
+        return document.querySelectorAll('[data-valid="false"]').length === 0;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                validateForm();
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>商品管理頁面</title>
+  <link rel="stylesheet" href="product.css">
+  <script src="product.js"></script>
+</head>
+<body>
+<header>
+  <nav>
+    <ul id="menu">
+      <li><a class="menuLink" href="/admin/order.html">訂單管理</a></li>
+      <li><a class="menuLink" href="/admin/campaign.html">活動管理</a></li>
+      <li><a class="menuLink" href="/admin/product.html">商品管理</a></li>
+    </ul>
+    <button id="logoutBtn" class="red-btn">登出</button>
+  </nav>
+</header>
+<main>
+  <div class="mainContainer">
+    <br>
+    <h1>商品新增</h1>
+    <form id="productForm" enctype="multipart/form-data">
+      <div id="productFormsContainer">
+      </div>
+      <button type="button" class="add-product-btn" onclick="addProductForm()">新增商品</button>
+      <button type="button" class="submit-btn" onclick="submitForm()">提交</button>
+    </form>
+  </div>
+</main>
+</body>
+</html>
