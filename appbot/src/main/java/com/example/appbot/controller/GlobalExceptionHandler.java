@@ -2,6 +2,7 @@ package com.example.appbot.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.BadSqlGrammarException;
+
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,11 +24,17 @@ public class GlobalExceptionHandler {
     }
 
     // validation產生錯誤
-    @ExceptionHandler
-    public ResponseEntity<?> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("msg", "Json參數有誤");
-        return ResponseEntity.badRequest().body(map);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("msg", "Body參數有誤");
+        return ResponseEntity.badRequest().body(body);
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgument(IllegalArgumentException e) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("msg", e.getMessage());
+        return ResponseEntity.badRequest().body(body);
     }
 
     // sql 語法錯誤

@@ -69,7 +69,10 @@ function submitForm() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                return response.json().then(errorData => {
+                    // 將錯誤信息傳遞到 .catch 中進行處理
+                    throw new Error(errorData.msg);
+                });
             }
             return response.json();
         })
