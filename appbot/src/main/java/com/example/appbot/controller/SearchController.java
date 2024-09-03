@@ -1,20 +1,18 @@
 package com.example.appbot.controller;
 
-import org.springframework.validation.BindingResult;
-import com.example.appbot.dao.CampaignDao;
 import com.example.appbot.dto.CampaignDTO;
 import com.example.appbot.dto.ProductDTO;
 import com.example.appbot.service.CampaignService;
 import com.example.appbot.service.LogisticService;
 import com.example.appbot.service.OrderService;
 import com.example.appbot.service.ProductService;
-import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -33,6 +30,8 @@ public class SearchController {
     private final OrderService orderService;
     private final CampaignService campaignService;
     private final LogisticService logisticService;
+    private Validator validator;
+
 
     public SearchController(ProductService productService, OrderService orderService, CampaignService campaignService, LogisticService logisticService) {
         this.productService = productService;
@@ -56,14 +55,19 @@ public class SearchController {
     }
     @PostMapping("/product/create")
     public ResponseEntity<?> createProducts(@RequestParam Map<String, String> formData,
-                                            @RequestParam("images") List<MultipartFile> images) {
+                                            @RequestParam("images") List<MultipartFile> images) throws MethodArgumentNotValidException {
         List<ProductDTO> products = new ArrayList<>();
         int index = 0;
         while (formData.containsKey("products[" + index + "].name")) {
             ProductDTO product = new ProductDTO();
+            Integer price = Integer.parseInt(formData.get("products[" + index + "].price"));
+            Integer stock = Integer.parseInt(formData.get("products[" + index + "].stock"));
+            if (price < 1 || stock < 1) {
+                throw new IllegalArgumentException("價格和庫存必須大於等於1");
+            }
             product.setName(formData.get("products[" + index + "].name"));
-            product.setPrice(Integer.parseInt(formData.get("products[" + index + "].price")));
-            product.setStock(Integer.parseInt(formData.get("products[" + index + "].stock")));
+            product.setPrice(price);
+            product.setStock(stock);
             product.setCategory(formData.get("products[" + index + "].category"));
             products.add(product);
             index++;
@@ -74,7 +78,6 @@ public class SearchController {
         response.put("data", productIds);
         return ResponseEntity.ok(response);
     }
-
 
 
     @GetMapping("/order/search")
