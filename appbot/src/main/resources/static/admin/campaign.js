@@ -7,7 +7,7 @@ function searchProductById(id) {
         productContainer.innerHTML = ""
         let tr = `
             <div class="product-image">
-                <img src="https://91-app.s3.ap-northeast-1.amazonaws.com/${d.image}" alt="Product Image">
+                <img src="${d.image}" alt="Product Image">
             </div>
             <div class="product-details">
                 <p>ID: ${d.id}</p>
