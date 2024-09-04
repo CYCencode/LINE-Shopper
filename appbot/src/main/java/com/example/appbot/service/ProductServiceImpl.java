@@ -23,7 +23,11 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> findProductById(Integer id) {
-        return productDao.findProductById(id);
+        List<ProductDTO> dtoList = productDao.findProductById(id);
+        dtoList.forEach(dto -> {
+            dto.setImage(s3Service.getFileUrl(dto.getImage()));
+        });
+        return dtoList;
     }
 
     @Override
