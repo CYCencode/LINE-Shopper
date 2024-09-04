@@ -71,6 +71,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDetailDTO> findOrderDetailListByOrderId(Integer orderId) {
+        // 首先更新購物車中的促銷活動
+        orderDetailDao.updateCampaignIdForCart(orderId);
         List<OrderDetailDTO> orderDetailDTO = orderDetailDao.findOrderDetailListByOrderId(orderId);
         // add s3 prefix
         orderDetailDTO.forEach(dto -> {dto.setProductImage(s3Service.getFileUrl(dto.getProductImage()));});

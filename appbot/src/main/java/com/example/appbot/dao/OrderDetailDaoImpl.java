@@ -1,6 +1,9 @@
 package com.example.appbot.dao;
 
 import com.example.appbot.dto.OrderDetailDTO;
+import com.example.appbot.service.OrderServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,6 +14,7 @@ import java.util.List;
 
 @Repository
 public class OrderDetailDaoImpl implements OrderDetailDao {
+    private static final Logger logger = LoggerFactory.getLogger(OrderDetailDaoImpl.class);
     private final NamedParameterJdbcTemplate template;
     public OrderDetailDaoImpl(NamedParameterJdbcTemplate template) {
         this.template = template;
@@ -48,13 +52,18 @@ public class OrderDetailDaoImpl implements OrderDetailDao {
         Integer orderDetailId = keyHolder.getKey().intValue();
         return orderDetailId;
     };
-
+    @Override
     public void updateCampaignIdForCart(Integer cartId) {
         String sql = "UPDATE order_details od " +
                 "JOIN campaigns c ON od.product_id = c.product_id " +
                 "AND c.create_at <= NOW() AND c.terminate_at >= NOW() " +
                 "SET od.campaign_id = c.id " +
-                "WHERE od.order_id = :cartId";
+                "WHERE od.order_id = :cartId "+
+                "AND c.id = ( "+
+                "SELECT c2.id FROM campaigns c2 "+
+                "WHERE c2.product_id = od.product_id "+
+                "AND c2.create_at <= NOW() AND c2.terminate_at >= NOW() "+
+                "ORDER BY c2.create_at DESC, c2.id DESC LIMIT 1 )";
 
         MapSqlParameterSource params = new MapSqlParameterSource("cartId", cartId);
 
