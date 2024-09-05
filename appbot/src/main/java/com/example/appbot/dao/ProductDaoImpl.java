@@ -79,12 +79,18 @@ public class ProductDaoImpl implements ProductDao {
 
     @Override
     public List<ProductDTO> findCampaign() {
-        String sql = "SELECT p.id, p.name, (p.price*c.discount_rate) AS price, p.image " +
-                "FROM products p " +
-                "JOIN campaigns c ON c.product_id = p.id " +
-                "WHERE c.create_at <= NOW() AND c.terminate_at >= NOW() " +
-                "ORDER BY c.create_at DESC " +
-                "LIMIT 3";
+        String sql = """
+                SELECT c.id, p.id, p.name, (p.price * c.discount_rate) AS price, p.image
+                FROM products p
+                JOIN campaigns c ON c.product_id = p.id
+                JOIN (
+                    SELECT product_id, MAX(id) AS max_id
+                    FROM campaigns
+                    WHERE create_at <= NOW() AND terminate_at >= NOW()
+                    GROUP BY product_id
+                ) latest_campaign ON latest_campaign.product_id = c.product_id AND latest_campaign.max_id = c.id
+                ORDER BY c.create_at DESC, c.id DESC LIMIT 3;
+                """;
         MapSqlParameterSource params = new MapSqlParameterSource();
         return template.query(sql, params, (rs, rowNum) ->
                 ProductDTO.builder()

@@ -101,6 +101,8 @@ public class LineBotServiceImpl implements LineBotService {
                 if (orderId == null) {
                     throw new CheckoutException("購物車內無商品");
                 }
+                List<OrderDetailDTO> orderDetails = orderDao.updateOrderTotal(orderId);
+                logger.info("Updated order details for orderId {}: {}", orderId, orderDetails);
                 Integer total = orderDao.getTotalByOrderId(orderId);
                 String checkoutUrl = String.format("%s?line_user_id=%s&cart_id=%s&total=%s", WEB_PAGE_CHECKOUT,userId, orderId, total);
                 return TextMessage.builder()
