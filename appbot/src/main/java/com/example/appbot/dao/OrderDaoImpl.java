@@ -16,6 +16,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,7 +63,8 @@ public class OrderDaoImpl implements OrderDao{
         params.addValue("line_user_name", lineUserName);
         params.addValue("order_status", orderStatus);
         params.addValue("total", 0);
-        params.addValue("currentTime", currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        //params.addValue("currentTime", currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        params.addValue("currentTime", Timestamp.from(currentTime.toInstant()));
         KeyHolder keyHolder = new GeneratedKeyHolder();
         template.update(sql, params, keyHolder, new String[] {"id"});
         Integer orderId = keyHolder.getKey().intValue();
@@ -91,10 +94,10 @@ public class OrderDaoImpl implements OrderDao{
         String sql = "UPDATE orders SET order_status = :status, last_modify_at = :lastModifyAt WHERE id = :id";
         params.addValue("status", orderStatus);
         params.addValue("id", cartId);
-        params.addValue("lastModifyAt", currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        //params.addValue("lastModifyAt", currentTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        params.addValue("lastModifyAt", Timestamp.from(currentTime.toInstant()));
         return template.update(sql, params);
     }
-
     @Override
     public String getTodaySerialNumber(){
         ZonedDateTime now = ZonedDateTime.now(getTimeZone());
@@ -103,7 +106,8 @@ public class OrderDaoImpl implements OrderDao{
         String sql ="SELECT COUNT(*) FROM orders WHERE DATE(create_at) = :today";
         //AND order_status = :order_status
         MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("today", now.toLocalDate());
+        params.addValue("today", Date.valueOf(now.toLocalDate()));
+        //params.addValue("today", now.toLocalDate());
             //.addValue("order_status", StatusCode.ORDER_STATUS_PAID.ordinal());
 
         Integer count = template.queryForObject(sql, params, Integer.class);
