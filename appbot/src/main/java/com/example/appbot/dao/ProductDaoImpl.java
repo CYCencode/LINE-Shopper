@@ -75,12 +75,12 @@ public class ProductDaoImpl implements ProductDao {
         return template.queryForObject(sql, params, Integer.class);
     }
 
-    ;
+
 
     @Override
     public List<ProductDTO> findCampaign() {
         String sql = """
-                SELECT c.id, p.id, p.name, (p.price * c.discount_rate) AS price, p.image
+                SELECT p.id, p.name, (p.price * c.discount_rate) AS price, p.image
                 FROM products p
                 JOIN campaigns c ON c.product_id = p.id
                 JOIN (
