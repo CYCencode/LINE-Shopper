@@ -26,8 +26,8 @@ CREATE TABLE `campaigns` (
   `id` int NOT NULL AUTO_INCREMENT,
   `product_id` int NOT NULL,
   `campaign_name` varchar(30) DEFAULT NULL,
-  `create_at` datetime DEFAULT NULL,
-  `terminate_at` datetime DEFAULT NULL,
+  `create_at` timestamp DEFAULT NULL,
+  `terminate_at` timestamp DEFAULT NULL,
   `discount_rate` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
@@ -124,8 +124,8 @@ CREATE TABLE `orders` (
   `line_user_name` varchar(20) NOT NULL,
   `order_status` int DEFAULT NULL,
   `total` int DEFAULT NULL,
-  `create_at` datetime DEFAULT NULL,
-  `last_modify_at` datetime DEFAULT NULL,
+  `create_at` timestamp DEFAULT NULL,
+  `last_modify_at` timestamp DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -156,7 +156,7 @@ CREATE TABLE `payments` (
   `auth_code` varchar(45) DEFAULT NULL,
   `amount` int DEFAULT NULL,
   `currency` varchar(3) DEFAULT NULL,
-  `transaction_time_millis` datetime(3) DEFAULT NULL,
+  `transaction_time_millis` timestamp(3) DEFAULT NULL,
   `bank_result_code` varchar(255) DEFAULT NULL,
   `bank_result_msg` varchar(300) DEFAULT NULL,
   `card_identifier` varchar(255) DEFAULT NULL,
